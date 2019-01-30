@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.cloud.webapp.validator.ValidEmail;
+import com.cloud.webapp.validator.ValidPassword;
 
 
 @Entity
@@ -23,7 +24,7 @@ public class User {
 	@Column(name="email")
 	private String email;
 	
-	
+	@ValidPassword
 	@Column(name="password")
 	private String password;
 	
