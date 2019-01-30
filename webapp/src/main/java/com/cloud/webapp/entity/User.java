@@ -7,6 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.cloud.webapp.validator.ValidEmail;
+
 
 @Entity
 @Table(name="user")
@@ -17,6 +19,7 @@ public class User {
 	@Column(name="id")
 	private int id;
 
+	@ValidEmail
 	@Column(name="email")
 	private String email;
 	
