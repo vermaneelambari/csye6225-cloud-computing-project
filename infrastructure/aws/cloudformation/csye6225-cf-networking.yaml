@@ -1,0 +1,198 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  stackname:
+    Description: Stack Name
+    Type: String
+    Default: stack01
+  myVpcCIDR:
+    Description: VPC CIDR
+    Type: String
+    Default: 10.0.0.0/16
+  Subnet1:
+    Description: Subnet 1
+    Type: String
+    Default: mySubnet1
+  subnet1CIDR:
+    Description: Subnet 1 CIDR
+    Type: String
+    Default: 10.0.1.0/24
+  Subnet1AZ:
+    Description: Subnet 1 Availability Zone 
+    Type: String
+    Default: us-east-1a
+  Subnet2:
+    Description: Subnet 2
+    Type: String
+    Default: mySubnet2
+  subnet2CIDR:
+    Description: Subnet 2 CIDR
+    Type: String
+    Default: 10.0.2.0/24
+  Subnet2AZ:
+    Description: Subnet 2 Availability Zone 
+    Type: String
+    Default: us-east-1b
+  Subnet3:
+    Description: Subnet 3
+    Type: String
+    Default: mySubnet3
+  subnet3CIDR:
+    Description: Subnet 3 CIDR
+    Type: String
+    Default: 10.0.3.0/24
+  Subnet3AZ:
+    Description: Subnet 3 Availability Zone 
+    Type: String
+    Default: us-east-1c
+Resources:
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Ref: myVpcCIDR
+      EnableDnsSupport: 'false'
+      EnableDnsHostnames: 'false'
+      InstanceTenancy: dedicated
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - ''
+          - - Ref: stackname
+            - "-csye6225-webapp-vpc" 
+  mySubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: myVPC
+      CidrBlock:
+        Ref: subnet1CIDR
+      AvailabilityZone:
+        Ref: Subnet1AZ
+      Tags:
+      - Key: Name
+        Value:
+          Ref: Subnet1
+  mySubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: myVPC
+      CidrBlock:
+        Ref: subnet2CIDR
+      AvailabilityZone:
+        Ref: Subnet2AZ
+      Tags:
+      - Key: Name
+        Value:
+          Ref: Subnet2
+  mySubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: myVPC
+      CidrBlock:
+        Ref: subnet3CIDR
+      AvailabilityZone:
+        Ref: Subnet3AZ
+      Tags:
+      - Key: Name
+        Value:
+          Ref: Subnet3
+  myInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - ''
+          - - Ref: stackname
+            - "-csye6225-webapp-ig"  
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: myVPC
+      InternetGatewayId:
+        Ref: myInternetGateway
+  myRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: myVPC
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - ''
+          - - Ref: stackname
+            - "-csye6225-webapp-rt"
+  mySubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: mySubnet1
+      RouteTableId:
+        Ref: myRouteTable
+  mySubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: mySubnet2
+      RouteTableId:
+        Ref: myRouteTable
+  mySubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: mySubnet3
+      RouteTableId:
+        Ref: myRouteTable
+  myRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: myRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: myInternetGateway
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - ''
+          - - Ref: stackname
+            - "-csye6225-webapp-sg"
+      GroupDescription: Enable HTTP access via port 80, SSH access via port 22
+      VpcId:
+        Ref: myVPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '80'
+        ToPort: '80'
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: 0.0.0.0/0
+Outputs:
+  vpcId:
+    Description: The resource id of the created vpc
+    Value:
+      Ref: myVPC
+  IgId:
+    Description: The resource id of the created Internet gateway
+    Value:
+      Ref: myInternetGateway
+  ec2Subnet:
+    Description: The resource id of the subnet for EC2
+    Value:
+      Ref: mySubnet1
+  ec2SecurityGroup:
+    Description: The resource id of the Security Group for EC2
+    Value:
+      Ref: WebServerSecurityGroup
