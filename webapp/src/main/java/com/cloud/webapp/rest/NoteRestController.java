@@ -10,7 +10,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cloud.webapp.entity.Note;
@@ -110,7 +108,7 @@ public class NoteRestController {
 
 	@DeleteMapping("/note/{id}")
 	public ResponseEntity<?> deleteNote(@PathVariable String id) {
-		Map<String, String> map = new HashMap();
+		Map<String, String> map = new HashMap<String, String>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
@@ -132,7 +130,6 @@ public class NoteRestController {
 			status = noteService.delete(id);
 		} catch (Exception ex) {
 			map.put("Error", ex.getMessage());
-			// entities.add(obj);
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 
@@ -147,8 +144,17 @@ public class NoteRestController {
 	}
 
 	@PutMapping("/note/{id}")
-	public ResponseEntity<?> updateNote(@RequestBody Note note, @PathVariable String id) {
-		Map<String, String> map = new HashMap();
+	public ResponseEntity<?> updateNote(@Valid @RequestBody Note note, BindingResult result, @PathVariable String id) {
+		Map<String, String> map = new HashMap<String, String>();
+		if(result.hasErrors()) {
+			StringJoiner sj = new StringJoiner(", ");
+			for(ObjectError objError : result.getAllErrors()) {
+				sj.add(objError.getDefaultMessage()); 
+			}
+			map.put("Error", sj.toString());
+			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+		}
+		
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
