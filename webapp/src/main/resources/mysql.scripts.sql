@@ -19,6 +19,23 @@ CREATE SCHEMA IF NOT EXISTS `webapp` DEFAULT CHARACTER SET latin1 ;
 USE `webapp` ;
 
 -- -----------------------------------------------------
+-- Table `webapp`.`note`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `webapp`.`note` ;
+
+CREATE TABLE IF NOT EXISTS `webapp`.`note` (
+  `id` VARCHAR(255) NOT NULL,
+  `content` VARCHAR(255) NOT NULL,
+  `created_on` VARCHAR(255) NULL DEFAULT NULL,
+  `last_updated` VARCHAR(255) NULL DEFAULT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `FKmoddtnuw3yy6ct34xnw6u0boh` (`user_id` ASC) VISIBLE)
+ENGINE = MyISAM
+DEFAULT CHARACTER SET = latin1;
+
+-- -----------------------------------------------------
 -- Table `webapp`.`user`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `webapp`.`user` ;
