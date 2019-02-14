@@ -70,11 +70,5 @@ public class WebappApplicationServiceLayerUnitTests {
 		when(noteDao.findById("4b92a272-10c4-4c29-ac11-1cc9f89763cf")).thenReturn(note);
 		equals(noteService.findById("4b92a272-10c4-4c29-ac11-1cc9f89763cf").getId());
 	}
-	
-//	@Test(expected=NullPointerException.class)
-//	public void testFindNoteWithInvalidId() {
-//		fail(noteService.findById("eca3c8d2-eb00-46ec-8ae4-a006193a46e4").getId());
-//	}
-
 
 }
