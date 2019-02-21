@@ -60,7 +60,7 @@ public class Note implements Serializable {
 	private List<Attachment> attachments;
 	
 	
-	public Note(UUID id, String content, String title,String created_on,String last_updated_on, User user) {
+	public Note(UUID id, String content, String title,String created_on,String last_updated_on, User user, List<Attachment> attachments) {
 		super();
 		this.id = id;
 		this.content = content;
@@ -68,6 +68,7 @@ public class Note implements Serializable {
 		this.created_on = created_on;
 		this.last_updated_on = last_updated_on;
 		this.user = user;
+		this.attachments = attachments;
 	}
 	
 	public Note() {
@@ -122,8 +123,12 @@ public class Note implements Serializable {
 		this.user = user;
 	}
 
-	
-	
-	
-	
+	public List<Attachment> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<Attachment> attachments) {
+		this.attachments = attachments;
+	}
+
 }
