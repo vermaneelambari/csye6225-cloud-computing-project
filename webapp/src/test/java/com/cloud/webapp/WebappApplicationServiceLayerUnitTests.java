@@ -45,7 +45,7 @@ public class WebappApplicationServiceLayerUnitTests {
 	public void before() {
 		user = new User(0, "rahul@gmail.com", "Welcome!1");
 		UUID uid = UUID.fromString("4b92a272-10c4-4c29-ac11-1cc9f89763cf");
-		note = new Note(uid,"content", "title", "Thu Feb 14 00:40:55 EST 2019", "Thu Feb 14 00:40:55 EST 2019",user );
+		note = new Note(uid,"content", "title", "Thu Feb 14 00:40:55 EST 2019", "Thu Feb 14 00:40:55 EST 2019",user, null );
 	}
 	
 	@Test
