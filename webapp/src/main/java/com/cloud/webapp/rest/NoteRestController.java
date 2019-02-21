@@ -96,9 +96,9 @@ public class NoteRestController {
 		note.setUser(user);
 		Map<String, String> map = new HashMap<>();
 		try {
-			noteService.save(note);
+			Note savedNote = noteService.save(note);
 			map.put("Success", "Note created successfully with id: " + note.getId());
-			return new ResponseEntity<>(map, HttpStatus.CREATED);
+			return new ResponseEntity<>(savedNote, HttpStatus.CREATED);
 		} catch (Exception e) {
 			map.put("Error", "bad Request");
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);

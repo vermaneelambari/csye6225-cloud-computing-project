@@ -1,8 +1,10 @@
 package com.cloud.webapp.entity;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -53,8 +56,11 @@ public class Note implements Serializable {
 	@JsonIgnore
 	private User user;
 	
+	@OneToMany(mappedBy="note", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Attachment> attachments;
 	
-	public Note(UUID id, String content, String title,String created_on,String last_updated_on, User user) {
+	
+	public Note(UUID id, String content, String title,String created_on,String last_updated_on, User user, List<Attachment> attachments) {
 		super();
 		this.id = id;
 		this.content = content;
@@ -62,6 +68,7 @@ public class Note implements Serializable {
 		this.created_on = created_on;
 		this.last_updated_on = last_updated_on;
 		this.user = user;
+		this.attachments = attachments;
 	}
 	
 	public Note() {
@@ -116,8 +123,12 @@ public class Note implements Serializable {
 		this.user = user;
 	}
 
-	
-	
-	
-	
+	public List<Attachment> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<Attachment> attachments) {
+		this.attachments = attachments;
+	}
+
 }

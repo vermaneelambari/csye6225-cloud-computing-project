@@ -50,9 +50,8 @@ Resources:
     Properties:
       CidrBlock:
         Ref: myVpcCIDR
-      EnableDnsSupport: 'false'
-      EnableDnsHostnames: 'false'
-      InstanceTenancy: dedicated
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       Tags:
       - Key: Name
         Value:
@@ -69,6 +68,7 @@ Resources:
         Ref: subnet1CIDR
       AvailabilityZone:
         Ref: Subnet1AZ
+      MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
         Value:
@@ -82,6 +82,7 @@ Resources:
         Ref: subnet2CIDR
       AvailabilityZone:
         Ref: Subnet2AZ
+      MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
         Value:
@@ -95,6 +96,7 @@ Resources:
         Ref: subnet3CIDR
       AvailabilityZone:
         Ref: Subnet3AZ
+      MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
         Value:
@@ -110,7 +112,7 @@ Resources:
           - - Ref: stackname
             - "-csye6225-webapp-ig"  
   AttachGateway:
-    Type: AWS::EC2::VPCGatewayAttachment
+    Type: AWS::EC2::VPCGatewayAttachment 
     Properties:
       VpcId:
         Ref: myVPC
@@ -184,14 +186,34 @@ Outputs:
     Description: The resource id of the created vpc
     Value:
       Ref: myVPC
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-vpcId"
   IgId:
     Description: The resource id of the created Internet gateway
     Value:
       Ref: myInternetGateway
-  ec2Subnet:
+  ec2Subnet1:
     Description: The resource id of the subnet for EC2
     Value:
       Ref: mySubnet1
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-subnet1"
+  ec2Subnet2:
+    Description: The resource id of the subnet for EC2
+    Value:
+      Ref: mySubnet2
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-subnet2"
+  ec2Subnet3:
+    Description: The resource id of the subnet for EC2
+    Value:
+      Ref: mySubnet3
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-subnet3"
   ec2SecurityGroup:
     Description: The resource id of the Security Group for EC2
     Value:
