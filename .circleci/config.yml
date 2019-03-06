@@ -9,6 +9,7 @@ jobs:
           name: Install AWS CLI
           command: |
             sudo apt-get install python3
+            sudo apt-get install python3-pip
             python3 --version
             pip3 --version
             sudo pip3 install -q awscli --upgrade
