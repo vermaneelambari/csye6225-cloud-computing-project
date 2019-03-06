@@ -17,6 +17,7 @@ jobs:
           name: Build Artifact
           command: |
             cd webapp
+            apt-get install maven
             mvn package
             cd target
             ls -al
