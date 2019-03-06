@@ -29,7 +29,7 @@ ami_id_status=$?
 echo $ami_id
 if [ $ami_id_status -eq 0 ]; then
 	
-	createOutput=$(aws cloudformation create-stack --stack-name $stack_name --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stackname ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack)
+	createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stackname ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack)
 	echo $createOutput
 
 	if [ $? -eq 0 ]; then
