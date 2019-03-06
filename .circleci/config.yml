@@ -2,15 +2,16 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.4
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - run:
           name: Install AWS CLI
           command: |
-            python --version
-            pip --version
-            sudo pip install -q awscli --upgrade
+            sudo apt-get install python3
+            python3 --version
+            pip3 --version
+            sudo pip3 install -q awscli --upgrade
             aws --version
             which aws
       - run:
