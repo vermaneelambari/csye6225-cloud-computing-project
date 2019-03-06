@@ -16,6 +16,11 @@
       "Description": "Netstack Name",
       "Type": "String",
       "Default": "myStack"
+    },
+    "keyname": {
+      "Description": "Key Name",
+      "Type": "String",
+      "Default": "csye6225"
     }
   },
   "Resources": {
@@ -26,6 +31,92 @@
         "ImageId": {
           "Ref": "amiid"
         },
+        "KeyName": {
+          "Ref": "keyname"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "\n",
+              [
+                "#!/bin/bash -xe",
+                "sudo bash",
+                "yum install httpd -y",
+                "systemctl enable httpd.service",
+                "systemctl start httpd.service",
+                "yum install ntp -y",
+                "systemctl start ntpd.service",
+                "systemctl enable ntpd.service",
+                "groupadd tomcat",
+                "useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat",
+                "cd /tmp",
+                "wget http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz",
+                "mkdir /opt/tomcat",
+                "tar xvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1",
+                "cd /opt/tomcat",
+                "chgrp -R tomcat /opt/tomcat",
+                "chmod -R g+r conf",
+                "chmod g+x conf",
+                "chown -R tomcat webapps/ work/ temp/ logs/",
+                "cd /opt/ && chown -R tomcat tomcat/",
+                "cd /etc/systemd/system",
+                "touch tomcat.service",
+                "echo '[Unit]' > tomcat.service",
+                "echo 'Description=Apache Tomcat Web Application Container' >> tomcat.service",
+                "echo 'After=syslog.target network.target' >> tomcat.service",
+                "echo '[Service]' >> tomcat.service",
+                "echo 'Type=forking' >> tomcat.service",
+                "echo 'Environment=JAVA_HOME=/usr/lib/jvm/jre' >> tomcat.service",
+                "echo 'Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid' >> tomcat.service",
+                "echo 'Environment=CATALINA_HOME=/opt/tomcat' >> tomcat.service",
+                "echo 'Environment=CATALINA_BASE=/opt/tomcat' >> tomcat.service",
+                "echo 'Environment=\"CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC\"' >> tomcat.service",
+                "echo 'Environment=\"JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom\"' >> tomcat.service",
+                "echo 'ExecStart=/opt/tomcat/bin/startup.sh' >> tomcat.service",
+                "echo 'ExecStop=/bin/kill -15 $MAINPID' >> tomcat.service",
+                "echo 'User=tomcat' >> tomcat.service",
+                "echo 'Group=tomcat' >> tomcat.service",
+                "echo 'UMask=0007' >> tomcat.service",
+                "echo 'RestartSec=10' >> tomcat.service",
+                "echo 'Restart=always' >> tomcat.service",
+                "echo '[Install]' >> tomcat.service",
+                "echo 'WantedBy=multi-user.target' >> tomcat.service",
+                "cd /opt/tomcat/bin",
+                "touch setenv.sh",
+                "chmod 777 setenv.sh",
+                "echo 'JAVA_OPTS=\"-Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true\"' >> setenv.sh",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.profiles.active=prod\"' >> setenv.sh \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=csye6225master \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=csye6225password \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=csye6225-spring2019-zorer.me.csye6225.com \n",
+                {
+                  "Fn::Join":[
+                     "",
+                     [
+                        "sudo echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.url=jdbc:mysql://",
+                        {
+                           "Fn::GetAtt":[
+                              "RDSDB",
+                              "Endpoint.Address"
+                           ]
+                        },
+                        ":3306/csye6225\"' >> setenv.sh \n"
+                     ]
+                  ]
+               },                
+                "systemctl daemon-reload",
+                "systemctl enable tomcat.service",
+                "systemctl start tomcat.service"
+              ]
+            ]
+          }
+        },
+        "Tags" : [
+          {
+             "Key" : "webappEC2",
+             "Value" : "webappEC2"
+          }
+       ],
         "Tenancy": "default",
         "InstanceType": "t2.micro",
         "DisableApiTermination": "false",
