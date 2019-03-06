@@ -47,7 +47,8 @@ jobs:
       - run:
           name: Upload Artifact to S3
           command: |
-            cd
+            echo ${AWS_ACCESS_KEY_ID}
+            echo ${AWS_SECRET_ACCESS_KEY}
             ls -al
             cd /home/circleci/project/codedeploy_artifact
             ls -ltr
