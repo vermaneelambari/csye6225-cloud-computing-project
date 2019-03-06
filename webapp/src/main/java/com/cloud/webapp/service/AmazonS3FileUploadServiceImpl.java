@@ -37,9 +37,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     @Autowired
     public AmazonS3FileUploadServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsS3AudioBucket) 
     {
-        this.amazonS3 = AmazonS3ClientBuilder.standard()
-                .withCredentials(awsCredentialsProvider)
-                .withRegion(awsRegion.getName()).build();
+        this.amazonS3 = AmazonS3ClientBuilder.standard().build();
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
