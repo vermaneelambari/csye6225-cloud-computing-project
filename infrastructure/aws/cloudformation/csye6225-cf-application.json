@@ -86,9 +86,9 @@
                 "chmod 777 setenv.sh",
                 "echo 'JAVA_OPTS=\"-Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true\"' >> setenv.sh",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.profiles.active=prod\"' >> setenv.sh \n",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=csye6225master \n",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=csye6225password \n",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=csye6225-spring2019-zorer.me.csye6225.com \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=csye6225master\"' >> setenv.sh \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=csye6225password\"' >> setenv.sh \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=csye6225-spring2019-zorer.me.csye6225.com\"' >> setenv.sh \n",
                 {
                   "Fn::Join": [
                     "",
