@@ -48,7 +48,8 @@ jobs:
           name: Upload Artifact to S3
           command: |
             cd
-            cd codedeploy_artifact
+            ls -al
+            cd /home/circleci/project/codedeploy_artifact
             ls -ltr
             aws s3 sync . s3://${aws_bucket_name} --region us-east-1
       - run:
