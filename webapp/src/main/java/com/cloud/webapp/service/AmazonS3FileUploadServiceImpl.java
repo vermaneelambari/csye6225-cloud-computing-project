@@ -41,6 +41,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
+         
         this.awsS3AudioBucket = awsS3AudioBucket;
     }
 
