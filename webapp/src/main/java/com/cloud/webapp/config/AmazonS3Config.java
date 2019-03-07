@@ -29,12 +29,12 @@ public class AmazonS3Config {
 	@Value("${aws.s3.audio.bucket}")
 	private String awsS3AudioBucket;
 //	
-//	@Bean(name = "awsCredentialsProvider")
-//	public AWSCredentialsProvider getAWSCredentials() {
-//		BasicAWSCredentials awsCredentials = new BasicAWSCredentials(this.awsKeyId, this.awsKeySecret);
-//		return new InstanceProfileCredentialsProvider(false);
-//        //return new AWSStaticCredentialsProvider(awsCredentials);
-//	}
+	@Bean(name = "awsCredentialsProvider")
+	public AWSCredentialsProvider getAWSCredentials() {
+		//BasicAWSCredentials awsCredentials = new BasicAWSCredentials(this.awsKeyId, this.awsKeySecret);
+		return new InstanceProfileCredentialsProvider(false);
+        //return new AWSStaticCredentialsProvider(awsCredentials);
+	}
 //
 //	@Bean(name = "awsKeyId")
 //	public String getAwsKeyId() {
