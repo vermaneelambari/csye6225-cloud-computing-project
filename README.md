@@ -33,4 +33,4 @@
 - You can run the provided test cases by right clicking on WebappApplicationServiceLayerUnitTests.java or WebappApplicationRestLayerUnitTests.java and running as JUnit Test.
 
 ## CI/CD
-changes related to bucket
+changes related to bucket name
