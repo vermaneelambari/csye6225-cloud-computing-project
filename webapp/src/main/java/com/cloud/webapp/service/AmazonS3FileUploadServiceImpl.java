@@ -86,7 +86,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
             
 			
 		} catch (IOException | AmazonServiceException ex) {
-            logger.error("error [" + ex.getMessage() + "] occurred while uploading [" + fileName + "] ", ex);           
+            logger.error("error [" + ex.getMessage() + "] occurred while uploading [" + fileName + "] ");           
             throw ex;
         }
 		
