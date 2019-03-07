@@ -37,6 +37,9 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     @Autowired
     public AmazonS3FileUploadServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsS3AudioBucket) 
     {
+    	logger.info("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
+    	logger.info("InstanceCredentials : secret: "+awsCredentialsProvider.getCredentials().getAWSSecretKey());
+    	System.out.println("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
         this.amazonS3 = AmazonS3ClientBuilder.defaultClient();
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
