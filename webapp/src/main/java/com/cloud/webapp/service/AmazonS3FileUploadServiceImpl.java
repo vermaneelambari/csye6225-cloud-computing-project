@@ -45,10 +45,11 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     			 .withCredentials(awsCredentialsProvider)
     			 .withRegion(awsRegion.getName())
     			 .build();
+    	 logger.info("AmazonS3 client created: "+ this.amazonS3.toString());
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
-         
+         logger.info("TransferManagerBuilder created: "+ this.tm.toString());
         this.awsS3AudioBucket = awsS3AudioBucket;
     }
 
