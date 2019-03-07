@@ -41,9 +41,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     	logger.info("InstanceCredentials : secret: "+awsCredentialsProvider.getCredentials().getAWSSecretKey());
     	logger.info("AWS Bucket Name: "+awsS3AudioBucket);
     	System.out.println("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
-    	 this.amazonS3 = AmazonS3ClientBuilder.standard()
-                 .withCredentials(awsCredentialsProvider)
-                 .withRegion(awsRegion.getName()).build();
+    	 this.amazonS3 = AmazonS3ClientBuilder.standard().build();
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
@@ -70,7 +68,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
 			PutObjectRequest putObjectRequest = new PutObjectRequest(this.awsS3AudioBucket, fileName, file);
 			
 //			if (enablePublicReadAccess) {
-                //putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
+                putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 //            }	
 			//this.amazonS3.putObject(putObjectRequest);
 			
