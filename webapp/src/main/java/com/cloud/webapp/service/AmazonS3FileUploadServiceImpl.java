@@ -70,7 +70,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
 			PutObjectRequest putObjectRequest = new PutObjectRequest(this.awsS3AudioBucket, fileName, file);
 			
 //			if (enablePublicReadAccess) {
-                putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
+                //putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 //            }	
 			//this.amazonS3.putObject(putObjectRequest);
 			
