@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -61,28 +62,29 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
 		
 		try {
 			
-			File file = new File(fileName);
-			FileOutputStream fos = new FileOutputStream(file);
-			fos.write(multipartFile.getBytes());
-			fos.close();
+//			File file = new File(fileName);
+//			FileOutputStream fos = new FileOutputStream(file);
+//			fos.write(multipartFile.getBytes());
+//			fos.close();
 			
 			
 			
 			
-			PutObjectRequest putObjectRequest = new PutObjectRequest(this.awsS3AudioBucket, fileName, file);
+			PutObjectRequest putObjectRequest = new PutObjectRequest(this.awsS3AudioBucket, fileName, multipartFile.getInputStream(), new ObjectMetadata());
 			
 //			if (enablePublicReadAccess) {
                 putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 //            }	
-			this.amazonS3.putObject(putObjectRequest);
+			//this.amazonS3.putObject(putObjectRequest);
 			
 			
-			//Upload upload = tm.upload(putObjectRequest);
-			//upload.waitForCompletion();
+			
+			Upload upload = tm.upload(putObjectRequest);
+			upload.waitForCompletion();
 			logger.info("Object URL: "+ amazonS3.getUrl(this.awsS3AudioBucket, fileName).toString());
 			
             //removing the file created in the server
-            file.delete();
+            //file.delete();
             return amazonS3.getUrl(this.awsS3AudioBucket, fileName).toString();
             
 			
