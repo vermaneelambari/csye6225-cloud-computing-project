@@ -32,7 +32,7 @@ public class AmazonS3Config {
 	@Bean(name = "awsCredentialsProvider")
 	public AWSCredentialsProvider getAWSCredentials() {
 		//BasicAWSCredentials awsCredentials = new BasicAWSCredentials(this.awsKeyId, this.awsKeySecret);
-		return new InstanceProfileCredentialsProvider(false);
+		return new InstanceProfileCredentialsProvider(true);
         //return new AWSStaticCredentialsProvider(awsCredentials);
 	}
 //

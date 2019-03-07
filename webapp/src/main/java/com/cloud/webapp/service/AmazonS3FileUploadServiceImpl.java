@@ -41,7 +41,10 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     	logger.info("InstanceCredentials : secret: "+awsCredentialsProvider.getCredentials().getAWSSecretKey());
     	logger.info("AWS Bucket Name: "+awsS3AudioBucket);
     	System.out.println("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
-    	 this.amazonS3 = AmazonS3ClientBuilder.standard().build();
+    	 this.amazonS3 = AmazonS3ClientBuilder.standard()
+    			 .withCredentials(awsCredentialsProvider)
+    			 .withRegion(awsRegion.getName())
+    			 .build();
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
@@ -83,7 +86,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
             
 			
 		} catch (IOException | AmazonServiceException ex) {
-            logger.error("error [" + ex.getMessage() + "] occurred while uploading [" + fileName + "] ");
+            logger.error("error [" + ex.getMessage() + "] occurred while uploading [" + fileName + "] ", ex);           
             throw ex;
         }
 		
