@@ -34,6 +34,9 @@
         },
         "CircleCiEC2AMIPolicyName": {
             "Type": "String"
+        },
+        "bucketname": {
+            "Type": "String"
         }
     },
     "Resources": {
@@ -333,10 +336,36 @@
                     "Statement": [
                         {
                             "Action": [
-                                "s3:*"
+                                "s3:Get*",
+                                "s3:List*",
+                                "s3:GetObjectAcl*",
+                                "s3:Put*"
                             ],
                             "Effect": "Allow",
-                            "Resource": "*"
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        ":",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "CodeDeployS3BucketName"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        ":",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "bucketname"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 },
@@ -403,7 +432,7 @@
                 },
                 "Ec2TagFilters": [
                     {
-                        "Key": "Name",
+                        "Key": "webappEC2",
                         "Value": "webappEC2",
                         "Type": "KEY_AND_VALUE"
                     }
