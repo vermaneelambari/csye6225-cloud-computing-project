@@ -60,6 +60,18 @@
               [
                 "#!/bin/bash -xe",
                 "sudo bash",
+                "yum install httpd -y",
+                "systemctl enable httpd.service",
+                "systemctl start httpd.service",
+                "yum install ntp -y",
+                "systemctl start ntpd.service",
+                "systemctl enable ntpd.service",
+                "groupadd tomcat",
+                "useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat",
+                "cd /tmp",
+                "wget http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz",
+                "mkdir /opt/tomcat",
+                "tar xvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1",
                 "cd /opt/tomcat",
                 "chgrp -R tomcat /opt/tomcat",
                 "chmod -R g+r conf",
@@ -95,7 +107,11 @@
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.profiles.active=prod\"' >> setenv.sh \n",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=csye6225master\"' >> setenv.sh \n",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=csye6225password\"' >> setenv.sh \n",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=",{"Ref":"bucketname"},"\"' >> setenv.sh \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=",
+                {
+                  "Ref": "bucketname"
+                },
+                "\"' >> setenv.sh \n",
                 {
                   "Fn::Join": [
                     "",
@@ -163,14 +179,7 @@
         ]
       }
     },
-    "ourCodeDeployApplication": {
-      "Type": "AWS::CodeDeploy::Application",
-      "Properties": {
-        "ApplicationName": {
-          "Ref": "CodeDeployApplicationName"
-        }
-      }
-    },
+    
     "IAMInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
@@ -344,39 +353,7 @@
           }
         ]
       }
-    },
-    "ourCodeDeploymentGroup": {
-      "Type": "AWS::CodeDeploy::DeploymentGroup",
-      "Properties": {
-        "ApplicationName": {
-          "Ref": "CodeDeployApplicationName"
-        },
-        "DeploymentGroupName": "csye6225-webapp-deployment",
-        "Ec2TagFilters": [
-          {
-            "Key": {
-              "Ref": "ec2tagfilter"
-            },
-            "Value": {
-              "Ref": "ec2tagfilter"
-            },
-            "Type": "KEY_AND_VALUE"
-          }
-        ],
-        "ServiceRoleArn": {
-          "Fn::ImportValue": {
-            "Fn::Join": [
-              "-",
-              [
-                {
-                  "Ref": "cicdstack"
-                },
-                "CodeDeployServiceRoleArn"
-              ]
-            ]
-          }
-        }
-      }
     }
+    
   }
 }

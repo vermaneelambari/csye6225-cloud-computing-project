@@ -80,34 +80,7 @@
                 },
                 "RoleName": {
                     "Ref": "CodeDeployEC2ServiceRoleName"
-                },
-                "Policies": [
-                    {
-                        "PolicyName": "AWSCodeDeployRolenew",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:DescribeInstances",
-                                        "ec2:DescribeInstanceStatus",
-                                        "ec2:TerminateInstances",
-                                        "tag:GetTags",
-                                        "tag:GetResources",
-                                        "sns:Publish",
-                                        "cloudwatch:DescribeAlarms",
-                                        "cloudwatch:PutMetricAlarm",
-                                        "cloudwatch:PutMetricData"
-                                    ],
-                                    "Resource": [
-                                        "*"
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ]
+                }
             }
         },
         "ourCircleCiEC2AMIPolicy": {
