@@ -19,6 +19,7 @@ public class AttachmentDaoImpl implements AttachmentDao {
 
 	@Autowired
 	public AttachmentDaoImpl(EntityManager theEntityManager) {
+		//entityManager = theEntityManager;
 		entityManager = theEntityManager;
 	}
 

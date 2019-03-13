@@ -21,6 +21,26 @@
       "Description": "Key Name",
       "Type": "String",
       "Default": "csye6225"
+    },
+    "bucketname":{
+      "Description": "bucket Name",
+      "Type": "String",
+      "Default": "csye6225-spring2019-ranadiven.me.csye6225.com"
+    },
+    "ec2tagfilter":{
+      "Description": "EC2 tag filter Name",
+      "Type": "String",
+      "Default": "webappEC2"
+    },
+    "cicdstack":{
+      "Description": "CICD stack Name",
+      "Type": "String",
+      "Default": "cicdstack"
+    },
+    "CodeDeployApplicationName":{
+      "Description": "code deploy application name",
+      "Type": "String",
+      "Default": "csye6225-webapp"
     }
   },
   "Resources": {
@@ -41,18 +61,6 @@
               [
                 "#!/bin/bash -xe",
                 "sudo bash",
-                "yum install httpd -y",
-                "systemctl enable httpd.service",
-                "systemctl start httpd.service",
-                "yum install ntp -y",
-                "systemctl start ntpd.service",
-                "systemctl enable ntpd.service",
-                "groupadd tomcat",
-                "useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat",
-                "cd /tmp",
-                "wget http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz",
-                "mkdir /opt/tomcat",
-                "tar xvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1",
                 "cd /opt/tomcat",
                 "chgrp -R tomcat /opt/tomcat",
                 "chmod -R g+r conf",
@@ -113,11 +121,15 @@
         },
         "Tags": [
           {
-            "Key": "webappEC2",
-            "Value": "webappEC2"
+            "Key": {
+              "Ref":"ec2tagfilter"
+            },
+            "Value": {
+              "Ref":"ec2tagfilter"
+            }
           }
         ],
-        "IamInstanceProfile" : {
+        "IamInstanceProfile": {
           "Ref": "IAMInstanceProfile"
         },
         "Tenancy": "default",
@@ -328,6 +340,47 @@
             "CidrIp": "0.0.0.0/0"
           }
         ]
+      }
+    },
+    "ourCodeDeployApplication": {
+      "Type": "AWS::CodeDeploy::Application",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "CodeDeployApplicationName"
+        }
+      }
+    },
+    "ourCodeDeploymentGroup": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "CodeDeployApplicationName"
+        },
+        "DeploymentGroupName": {
+          "Ref": "CodeDeployApplicationName"
+        },
+        "Ec2TagFilters": [
+          {
+            "Key": "Name",
+            "Value":{
+              "Ref": "ec2tagfilter"
+            },
+            "Type": "KEY_AND_VALUE"
+          }
+        ],
+        "ServiceRoleArn": {
+          "Fn::ImportValue": {
+            "Fn::Join": [
+              "-",
+              [
+                {
+                  "Ref": "cicdstack"
+                },
+                "CodeDeployServiceRoleArn"
+              ]
+            ]
+          }
+        }
       }
     }
   }
