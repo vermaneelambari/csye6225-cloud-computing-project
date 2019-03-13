@@ -121,12 +121,8 @@
         },
         "Tags": [
           {
-            "Key": {
-              "Ref":"ec2tagfilter"
-            },
-            "Value": {
-              "Ref":"ec2tagfilter"
-            }
+            "Key": "webappEC2",
+            "Value": "webappEC2"
           }
         ],
         "IamInstanceProfile": {
@@ -166,6 +162,14 @@
             ]
           }
         ]
+      }
+    },
+    "ourCodeDeployApplication": {
+      "Type": "AWS::CodeDeploy::Application",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "CodeDeployApplicationName"
+        }
       }
     },
     "IAMInstanceProfile": {
@@ -342,14 +346,7 @@
         ]
       }
     },
-    "ourCodeDeployApplication": {
-      "Type": "AWS::CodeDeploy::Application",
-      "Properties": {
-        "ApplicationName": {
-          "Ref": "CodeDeployApplicationName"
-        }
-      }
-    },
+   
     "ourCodeDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup",
       "Properties": {
@@ -357,12 +354,24 @@
           "Ref": "CodeDeployApplicationName"
         },
         "DeploymentGroupName": {
-          "Ref": "CodeDeployApplicationName"
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "CodeDeployApplicationName"
+              },
+              "deployment"
+            ]
+          ]
         },
         "Ec2TagFilters": [
           {
-            "Key": "Name",
-            "Value": "webappEC2",
+            "Key": {
+              "Ref": "ec2tagfilter"
+            },
+            "Value": {
+              "Ref": "ec2tagfilter"
+            },
             "Type": "KEY_AND_VALUE"
           }
         ],
