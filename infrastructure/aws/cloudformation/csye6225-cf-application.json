@@ -362,9 +362,7 @@
         "Ec2TagFilters": [
           {
             "Key": "Name",
-            "Value":{
-              "Ref": "ec2tagfilter"
-            },
+            "Value": "webappEC2",
             "Type": "KEY_AND_VALUE"
           }
         ],
