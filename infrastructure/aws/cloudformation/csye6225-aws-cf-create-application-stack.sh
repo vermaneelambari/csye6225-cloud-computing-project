@@ -34,7 +34,7 @@ if [ $ami_id_status -eq 0 ]; then
 	DOMAINNAME=$(aws route53 list-hosted-zones --query HostedZones[0].Name --output text)
 	DNS=${DOMAINNAME::-1}
 	echo $DNS
-	bucket_name="code-deploy-${DNS}"
+	bucket_name="${DNS}.csye6225.com"
 	echo $bucket_name
 	ec2tagfilter="webappEC2"
 	echo $ec2tagfilter

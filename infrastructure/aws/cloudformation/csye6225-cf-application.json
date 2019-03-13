@@ -24,8 +24,7 @@
     },
     "bucketname": {
       "Description": "bucket Name",
-      "Type": "String",
-      "Default": "csye6225-spring2019-ranadiven.me.csye6225.com"
+      "Type": "String"
     },
     "ec2tagfilter": {
       "Description": "EC2 tag filter Name",
@@ -96,7 +95,7 @@
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.profiles.active=prod\"' >> setenv.sh \n",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=csye6225master\"' >> setenv.sh \n",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=csye6225password\"' >> setenv.sh \n",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=csye6225-spring2019-ranadiven.me.csye6225.com\"' >> setenv.sh \n",
+                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=",{"Ref":"bucketname"},"\"' >> setenv.sh \n",
                 {
                   "Fn::Join": [
                     "",
