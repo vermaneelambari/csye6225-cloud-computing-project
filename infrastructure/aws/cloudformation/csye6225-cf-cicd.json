@@ -362,7 +362,17 @@
                                 "s3:PutObject"
                             ],
                             "Resource": [
-                                "*"
+                                {
+                                    "Fn::Join": [
+                                        ":",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "CodeDeployS3BucketName"
+                                            }
+                                        ]
+                                    ]
+                                }
                             ]
                         }
                     ]
