@@ -22,22 +22,22 @@
       "Type": "String",
       "Default": "csye6225"
     },
-    "bucketname":{
+    "bucketname": {
       "Description": "bucket Name",
       "Type": "String",
       "Default": "csye6225-spring2019-ranadiven.me.csye6225.com"
     },
-    "ec2tagfilter":{
+    "ec2tagfilter": {
       "Description": "EC2 tag filter Name",
       "Type": "String",
       "Default": "webappEC2"
     },
-    "cicdstack":{
+    "cicdstack": {
       "Description": "CICD stack Name",
       "Type": "String",
       "Default": "cicdstack"
     },
-    "CodeDeployApplicationName":{
+    "CodeDeployApplicationName": {
       "Description": "code deploy application name",
       "Type": "String",
       "Default": "csye6225-webapp"
@@ -346,24 +346,13 @@
         ]
       }
     },
-   
     "ourCodeDeploymentGroup": {
       "Type": "AWS::CodeDeploy::DeploymentGroup",
       "Properties": {
         "ApplicationName": {
           "Ref": "CodeDeployApplicationName"
         },
-        "DeploymentGroupName": {
-          "Fn::Join": [
-            "-",
-            [
-              {
-                "Ref": "CodeDeployApplicationName"
-              },
-              "deployment"
-            ]
-          ]
-        },
+        "DeploymentGroupName": "csye6225-webapp-deployment",
         "Ec2TagFilters": [
           {
             "Key": {
