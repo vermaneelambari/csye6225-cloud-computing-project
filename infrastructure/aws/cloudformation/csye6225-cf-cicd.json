@@ -343,11 +343,22 @@
                             "Action": [
                                 "s3:Get*",
                                 "s3:List*",
-                                "s3:GetObjectAcl*",
+                                "s3:Delete*",
                                 "s3:Put*"
                             ],
                             "Effect": "Allow",
                             "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "CodeDeployS3BucketName"
+                                            }
+                                        ]
+                                    ]
+                                },
                                 {
                                     "Fn::Join": [
                                         "",
@@ -369,6 +380,17 @@
                                                 "Ref": "bucketname"
                                             },
                                             "/*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "bucketname"
+                                            }
                                         ]
                                     ]
                                 }
