@@ -32,18 +32,17 @@ jobs:
             pwd
             ls -al
             mkdir -p codedeploy_artifact
-            cp infrastructure/aws/codedeploy/*.sh .
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp/target/ROOT.war *.sh *.yml
-            ls -al
-            mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
-            ls -al
-            pwd
-            cd codedeploy_artifact
+            cp infrastructure/aws/codedeploy/*.sh codedeploy_artifact/
+            cp webapp/target/ROOT.war codedeploy_artifact/
+            cp appspec.yml codedeploy_artifact/
+            cd codedeploy_artifact/
+            zip  csye6225-web-app-${CIRCLE_BUILD_NUM}.zip *
             ls -al
             pwd
-            cd ..
-            pwd
+            chmod 777 csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
             ls -al
+            pwd
+            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name}
       - run:
           name: Upload Artifact to S3
           command: |
@@ -53,7 +52,7 @@ jobs:
             ls -al
             cd /home/circleci/project/codedeploy_artifact
             ls -ltr
-            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name} --region us-east-1
+            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name}
       - run:
           name: Make CodeDeploy API call
           command: |
