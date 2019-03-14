@@ -11,3 +11,5 @@ Example command: ./csye6225-aws-cf-create-stack.sh myStack 10.0.0.0/16 subnet1 1
 - Following parameters are expected while running the script: [stack name]
 
 Example command: ./csye6225-aws-cf-terminate-stack.sh myStack
+
+#changes done for ci cd

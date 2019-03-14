@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -34,15 +35,22 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     private TransferManager tm;
     private static final Logger logger = LoggerFactory.getLogger(AmazonS3FileUploadServiceImpl.class);
     
-    @Autowired
+   // @Autowired
     public AmazonS3FileUploadServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsS3AudioBucket) 
     {
-        this.amazonS3 = AmazonS3ClientBuilder.standard()
-                .withCredentials(awsCredentialsProvider)
-                .withRegion(awsRegion.getName()).build();
+    	logger.info("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
+    	logger.info("InstanceCredentials : secret: "+awsCredentialsProvider.getCredentials().getAWSSecretKey());
+    	logger.info("AWS Bucket Name: "+awsS3AudioBucket);
+    	System.out.println("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
+    	 this.amazonS3 = AmazonS3ClientBuilder.standard()
+    			 .withCredentials(awsCredentialsProvider)
+    			 .withRegion(awsRegion.getName())
+    			 .build();
+    	 logger.info("AmazonS3 client created: "+ this.amazonS3.toString());
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
+         logger.info("TransferManagerBuilder created: "+ this.tm.toString());
         this.awsS3AudioBucket = awsS3AudioBucket;
     }
 
@@ -54,15 +62,15 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
 		
 		try {
 			
-			File file = new File(fileName);
-			FileOutputStream fos = new FileOutputStream(file);
-			fos.write(multipartFile.getBytes());
-			fos.close();
+//			File file = new File(fileName);
+//			FileOutputStream fos = new FileOutputStream(file);
+//			fos.write(multipartFile.getBytes());
+//			fos.close();
 			
 			
 			
 			
-			PutObjectRequest putObjectRequest = new PutObjectRequest(this.awsS3AudioBucket, fileName, file);
+			PutObjectRequest putObjectRequest = new PutObjectRequest(this.awsS3AudioBucket, fileName, multipartFile.getInputStream(), new ObjectMetadata());
 			
 //			if (enablePublicReadAccess) {
                 putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
@@ -70,17 +78,18 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
 			//this.amazonS3.putObject(putObjectRequest);
 			
 			
+			
 			Upload upload = tm.upload(putObjectRequest);
 			upload.waitForCompletion();
 			logger.info("Object URL: "+ amazonS3.getUrl(this.awsS3AudioBucket, fileName).toString());
 			
             //removing the file created in the server
-            file.delete();
+            //file.delete();
             return amazonS3.getUrl(this.awsS3AudioBucket, fileName).toString();
             
 			
 		} catch (IOException | AmazonServiceException ex) {
-            logger.error("error [" + ex.getMessage() + "] occurred while uploading [" + fileName + "] ");
+            logger.error("error [" + ex.getMessage() + "] occurred while uploading [" + fileName + "] ");           
             throw ex;
         }
 		

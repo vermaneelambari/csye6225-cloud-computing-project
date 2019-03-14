@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+
+files:             
+  - source: ./webapp/target/ROOT.war
+    destination: /opt/tomcat/webapps
+hooks:
+  AfterInstall:
+   - location: ./afterInstall.sh
+     timeout: 180
+     runas: centos
+  ApplicationStart:
+   - location: ./applicationStart.sh
+     timeout: 180
