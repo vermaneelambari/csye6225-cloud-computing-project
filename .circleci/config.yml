@@ -54,7 +54,7 @@ jobs:
             ls -al
             cd /home/circleci/project/codedeploy_artifact
             ls -ltr
-            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name}
+            aws s3 cp /home/circleci/project/appspec.yml s3://${aws_bucket_name}
       - run:
           name: Make CodeDeploy API call
           command: |
