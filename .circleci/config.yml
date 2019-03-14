@@ -49,10 +49,11 @@ jobs:
           command: |
             echo ${AWS_ACCESS_KEY_ID}
             echo ${AWS_SECRET_ACCESS_KEY}
+            echo ${aws_bucket_name}
             ls -al
             cd /home/circleci/project/codedeploy_artifact
             ls -ltr
-            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name}/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
+            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name}
       - run:
           name: Make CodeDeploy API call
           command: |
