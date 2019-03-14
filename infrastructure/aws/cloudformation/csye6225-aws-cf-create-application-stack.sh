@@ -3,11 +3,12 @@
 
 stack_name=$1
 net_stack=$2
+cicd_stack=$3
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
 	echo "--------------------------Error in Parameters--------------------------"
 	echo -e "You need to provide following parameters in the same order as follows:\n\
-	StackName\n Other StackName"
+	StackName\n Network StackName\n CICD stackName"
 exit 1
 fi
 echo $stack_name
@@ -27,21 +28,35 @@ ami_id=$(aws ec2 describe-images --filters "Name=name,Values=csye6225*" 'Name=st
 ami_id_status=$?
 
 echo $ami_id
+
+
 if [ $ami_id_status -eq 0 ]; then
-	
-	createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stackname ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack)
-	echo $createOutput
+	DOMAINNAME=$(aws route53 list-hosted-zones --query HostedZones[0].Name --output text)
+	DNS=${DOMAINNAME::-1}
+	echo $DNS
+	bucket_name="${DNS}.csye6225.com"
+	echo $bucket_name
+	ec2tagfilter="webappEC2"
+	echo $ec2tagfilter
+	#cdappname="csye6225-webapp"
+	#echo $cdappname
+	dns_id_status=$? 
+	if [ $dns_id_status -eq 0 ]; then
+	  
+	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stackname ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack )
+	  echo $createOutput
 
-	if [ $? -eq 0 ]; then
-		echo "Creating Stack Now"
-		aws cloudformation wait stack-create-complete --stack-name $stack_name
-		echo "successfully created Stack: " $stack_name "with ID: " $createOutput
+	  if [ $? -eq 0 ]; then
+		  echo "Creating Stack Now"
+		  aws cloudformation wait stack-create-complete --stack-name $stack_name
+		  echo "successfully created Stack: " $stack_name "with ID: " $createOutput
 
-	else
-		echo "Error while creating stack"
-		echo $createOutput
-		exit 1
-	fi;
+	  else
+		  echo "Error while creating stack"
+		  echo $createOutput
+		  exit 1
+	  fi;
+	fi
 else
 	echo "Image not found"
 	exit 1

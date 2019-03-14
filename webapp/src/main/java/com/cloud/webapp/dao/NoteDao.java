@@ -14,5 +14,6 @@ public interface NoteDao {
 
 	public int delete(String id);
 
+	//public Note update(String id, Note note);
 	public Note update(String id, Note note);
 }

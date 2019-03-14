@@ -21,6 +21,25 @@
       "Description": "Key Name",
       "Type": "String",
       "Default": "csye6225"
+    },
+    "bucketname": {
+      "Description": "bucket Name",
+      "Type": "String"
+    },
+    "ec2tagfilter": {
+      "Description": "EC2 tag filter Name",
+      "Type": "String",
+      "Default": "webappEC2"
+    },
+    "cicdstack": {
+      "Description": "CICD stack Name",
+      "Type": "String",
+      "Default": "cicdstack"
+    },
+    "CodeDeployApplicationName": {
+      "Description": "code deploy application name",
+      "Type": "String",
+      "Default": "csye6225-webapp"
     }
   },
   "Resources": {
@@ -50,7 +69,7 @@
                 "groupadd tomcat",
                 "useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat",
                 "cd /tmp",
-                "wget http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz",
+                "wget https://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz",
                 "mkdir /opt/tomcat",
                 "tar xvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1",
                 "cd /opt/tomcat",
@@ -88,7 +107,18 @@
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.profiles.active=prod\"' >> setenv.sh \n",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.username=csye6225master\"' >> setenv.sh \n",
                 "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dspring.datasource.password=csye6225password\"' >> setenv.sh \n",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=csye6225-spring2019-zorer.me.csye6225.com\"' >> setenv.sh \n",
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.s3.audio.bucket=",
+                      {
+                        "Ref": "bucketname"
+                      },
+                      "\"' >> setenv.sh \n"
+                    ]
+                  ]
+                },
                 {
                   "Fn::Join": [
                     "",
@@ -117,7 +147,7 @@
             "Value": "webappEC2"
           }
         ],
-        "IamInstanceProfile" : {
+        "IamInstanceProfile": {
           "Ref": "IAMInstanceProfile"
         },
         "Tenancy": "default",
@@ -154,6 +184,15 @@
             ]
           }
         ]
+      }
+    },
+    "ourCodeDeployApplication": {
+      "Type": "AWS::CodeDeploy::Application",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "CodeDeployApplicationName"
+        },
+        "ComputePlatform": "Server"
       }
     },
     "IAMInstanceProfile": {
@@ -328,6 +367,57 @@
             "CidrIp": "0.0.0.0/0"
           }
         ]
+      }
+    },
+    "ourCodeDeploymentGroup": {
+      "Type": "AWS::CodeDeploy::DeploymentGroup",
+      "DependsOn": "ourCodeDeployApplication",
+      "Properties": {
+        "ApplicationName": {
+          "Ref": "CodeDeployApplicationName"
+        },
+        "DeploymentConfigName": "CodeDeployDefault.AllAtOnce",
+        "DeploymentGroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "CodeDeployApplicationName"
+              },
+              "deployment"
+            ]
+          ]
+        },
+        "DeploymentStyle": {
+          "DeploymentOption": "WITHOUT_TRAFFIC_CONTROL",
+          "DeploymentType": "IN_PLACE"
+        },
+        "Ec2TagFilters": [
+          {
+            "Key": "webappEC2",
+            "Value": "webappEC2",
+            "Type": "KEY_AND_VALUE"
+          }
+        ],
+        "AutoRollbackConfiguration": {
+          "Enabled": "true",
+          "Events": [
+            "DEPLOYMENT_FAILURE"
+          ]
+        },
+        "ServiceRoleArn": {
+          "Fn::ImportValue": {
+            "Fn::Join": [
+              "-",
+              [
+                {
+                  "Ref": "cicdstack"
+                },
+                "CodeDeployServiceRoleArn"
+              ]
+            ]
+          }
+        }
       }
     }
   }
