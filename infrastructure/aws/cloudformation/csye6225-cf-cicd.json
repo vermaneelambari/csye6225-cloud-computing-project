@@ -427,8 +427,8 @@
                                             "arn:aws:s3:::",
                                             {
                                                 "Ref": "CodeDeployS3BucketName"
-                                            },
-                                            "/*"
+                                            }
+                                            
                                         ]
                                     ]
                                 },
@@ -438,7 +438,7 @@
                                         [
                                             "arn:aws:s3:::",
                                             {
-                                                "Ref": "bucketname"
+                                                "Ref": "CodeDeployS3BucketName"
                                             },
                                             "/*"
                                         ]
