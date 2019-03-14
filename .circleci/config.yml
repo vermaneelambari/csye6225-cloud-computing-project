@@ -42,6 +42,7 @@ jobs:
             chmod 777 csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
             ls -al
             pwd
+            aws s3 cp csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${aws_bucket_name}
       - run:
           name: Upload Artifact to S3
           command: |
