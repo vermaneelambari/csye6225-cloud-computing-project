@@ -85,17 +85,6 @@
                 }
             }
         },
-        "ourCodeDeployServiceInstanceProfile":{
-            "Type": "AWS::IAM::InstanceProfile",
-            "Properties": {
-              "Path": "/",
-              "Roles": [
-                {
-                    "Ref": "ourCodeDeployServiceRole"
-                }
-              ]
-            }
-        },
         "ourCircleCiEC2AMIPolicy": {
             "Type": "AWS::IAM::ManagedPolicy",
             "Properties": {
@@ -348,7 +337,7 @@
                         {
                             "Effect": "Allow",
                             "Action": [
-                                "s3:PutObject"
+                                "s3:*"
                             ],
                             "Resource": [
                                 {
@@ -362,15 +351,24 @@
                                             "/*"
                                         ]
                                     ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "CodeDeployS3BucketName"
+                                            }
+                                        ]
+                                    ]
                                 }
                             ]
                         }
                     ]
                 },
                 "Users": [
-                    {
-                        "Ref": "CircleCiUser"
-                    }
+                    "circleci"
                 ]
             }
         }
