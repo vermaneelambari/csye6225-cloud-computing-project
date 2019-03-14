@@ -17,7 +17,7 @@ DOMAINNAME=$(aws route53 list-hosted-zones --query HostedZones[0].Name --output 
 DNS=${DOMAINNAME::-1}
 echo $DNS
 
-CODEDEPLOYS3BUCKETNAME="code-deploy-${DNS}"
+CODEDEPLOYS3BUCKETNAME="code-deploy.${DNS}"
 echo $CODEDEPLOYS3BUCKETNAME
 BUCKETNAME="${DNS}.csye6225.com"
 echo $BUCKETNAME
