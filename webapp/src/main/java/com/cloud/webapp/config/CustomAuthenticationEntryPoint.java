@@ -24,6 +24,7 @@ public class CustomAuthenticationEntryPoint extends BasicAuthenticationEntryPoin
 		} else {
 			json = String.format("{\"message\": \"%s\"}", "Invalid credentials");
 		}
+		//response.getWriter().write(json);
 		response.getWriter().write(json);
 	}
 
