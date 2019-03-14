@@ -58,6 +58,7 @@
                         }
                     ]
                 },
+                "Path": "/",
                 "RoleName": {
                     "Ref": "CodeDeployServiceRoleName"
                 }
@@ -78,9 +79,21 @@
                         }
                     ]
                 },
+                "Path": "/",
                 "RoleName": {
                     "Ref": "CodeDeployEC2ServiceRoleName"
                 }
+            }
+        },
+        "ourCodeDeployServiceInstanceProfile":{
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+              "Path": "/",
+              "Roles": [
+                {
+                    "Ref": "ourCodeDeployServiceRole"
+                }
+              ]
             }
         },
         "ourCircleCiEC2AMIPolicy": {
@@ -129,89 +142,7 @@
                                 "ec2:StopInstances",
                                 "ec2:TerminateInstances"
                             ],
-                            "Resource": [
-                                {
-                                    "Fn::Join": [
-                                        ":",
-                                        [
-                                            "arn:aws:codedeploy",
-                                            {
-                                                "Ref": "AWSRegion"
-                                            },
-                                            {
-                                                "Ref": "AWSAccountID"
-                                            },
-                                            "application",
-                                            {
-                                                "Ref": "CodeDeployApplicationName"
-                                            }
-                                        ]
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "codedeploy:CreateDeployment",
-                                "codedeploy:GetDeployment"
-                            ],
-                            "Resource": [
-                                "*"
-                            ]
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "codedeploy:GetDeploymentConfig"
-                            ],
-                            "Resource": [
-                                {
-                                    "Fn::Join": [
-                                        ":",
-                                        [
-                                            "arn:aws:codedeploy",
-                                            {
-                                                "Ref": "AWSRegion"
-                                            },
-                                            {
-                                                "Ref": "AWSAccountID"
-                                            },
-                                            "deploymentconfig:CodeDeployDefault.OneAtATime"
-                                        ]
-                                    ]
-                                },
-                                {
-                                    "Fn::Join": [
-                                        ":",
-                                        [
-                                            "arn:aws:codedeploy",
-                                            {
-                                                "Ref": "AWSRegion"
-                                            },
-                                            {
-                                                "Ref": "AWSAccountID"
-                                            },
-                                            "deploymentconfig:CodeDeployDefault.HalfAtATime"
-                                        ]
-                                    ]
-                                },
-                                {
-                                    "Fn::Join": [
-                                        ":",
-                                        [
-                                            "arn:aws:codedeploy",
-                                            {
-                                                "Ref": "AWSRegion"
-                                            },
-                                            {
-                                                "Ref": "AWSAccountID"
-                                            },
-                                            "deploymentconfig:CodeDeployDefault.AllAtOnce"
-                                        ]
-                                    ]
-                                }
-                            ]
+                            "Resource": "*"
                         }
                     ]
                 },
@@ -420,18 +351,6 @@
                                 "s3:PutObject"
                             ],
                             "Resource": [
-                                {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "arn:aws:s3:::",
-                                            {
-                                                "Ref": "CodeDeployS3BucketName"
-                                            }
-                                            
-                                        ]
-                                    ]
-                                },
                                 {
                                     "Fn::Join": [
                                         "",
