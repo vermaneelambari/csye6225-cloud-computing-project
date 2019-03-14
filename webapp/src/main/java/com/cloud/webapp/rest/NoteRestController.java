@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cloud.webapp.entity.Attachment;
 import com.cloud.webapp.entity.Note;
 import com.cloud.webapp.entity.User;
+import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
 
@@ -33,11 +35,13 @@ public class NoteRestController {
 
 	private NoteService noteService;
 	private UserService userService;
+	private FileUploadService fileUploadService;
 
 	@Autowired
-	public NoteRestController(NoteService theNoteService, UserService theUerService) {
+	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService) {
 		noteService = theNoteService;
 		userService = theUerService;
+		fileUploadService = theFileUploadService;
 	}
 
 	@GetMapping("/note")
@@ -126,7 +130,10 @@ public class NoteRestController {
 				map.put("Error", "You are not authenticated");
 				return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
 			}
-
+			for(Attachment attachment: note.getAttachments()) {
+				String fileName = attachment.getUrl().substring(attachment.getUrl().lastIndexOf("/")+1);
+				this.fileUploadService.deleteFile(fileName);
+			}
 			status = noteService.delete(id);
 		} catch (Exception ex) {
 			map.put("Error", ex.getMessage());
