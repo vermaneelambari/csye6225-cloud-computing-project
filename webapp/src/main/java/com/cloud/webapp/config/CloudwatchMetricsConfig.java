@@ -11,7 +11,7 @@ import com.timgroup.statsd.StatsDClient;
 @Configuration
 public class CloudwatchMetricsConfig {
 
-	@Value("${metrics.publish}")
+	@Value("${publish.metrics}")
 	public boolean metricsPublish;
 	
 	@Value("${metrics.server.hostname}")

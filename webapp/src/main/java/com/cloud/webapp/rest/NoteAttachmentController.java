@@ -32,6 +32,7 @@ import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.AttachmentService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 
 @RestController
 @RequestMapping("/note")
@@ -41,14 +42,16 @@ public class NoteAttachmentController {
 	private AttachmentService attachmentService;
 	private NoteService noteService;
 	private UserService userService;
+	private StatsDClient statsDClient;
 
 	@Autowired
 	public NoteAttachmentController(FileUploadService amazonS3ClientService, NoteService theNoteService,
-			UserService theUerService, AttachmentService attachmentService) {
+			UserService theUerService, AttachmentService attachmentService, StatsDClient theStatsDClient) {
 		this.fileUploadService = amazonS3ClientService;
 		this.attachmentService = attachmentService;
 		this.noteService = theNoteService;
 		this.userService = theUerService;
+		this.statsDClient = theStatsDClient;
 	}
 	
 	@GetMapping("/{id}/attachments")

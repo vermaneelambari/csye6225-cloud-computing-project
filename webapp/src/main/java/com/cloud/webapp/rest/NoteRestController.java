@@ -50,7 +50,7 @@ public class NoteRestController {
 
 	@GetMapping("/note")
 	public List<Note> findAll() {
-		statsDClient.incrementCounter("hi");
+		statsDClient.incrementCounter("endpoint.note.api.get");
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
@@ -61,6 +61,7 @@ public class NoteRestController {
 
 	@GetMapping(path = "/note/{id}")
 	public ResponseEntity<?> findOne(@PathVariable String id) {
+		statsDClient.incrementCounter("endpoint.note.api.get");
 		Map<String, String> map = new HashMap<>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -88,7 +89,7 @@ public class NoteRestController {
 
 	@PostMapping("/note")
 	public ResponseEntity<?> createNote(@Valid @RequestBody Note note, BindingResult result) {
-		
+		statsDClient.incrementCounter("endpoint.note.api.post");
 		if(result.hasErrors()) {
 			StringJoiner sj = new StringJoiner(", ");
 			for(ObjectError objError : result.getAllErrors()) {
@@ -117,6 +118,7 @@ public class NoteRestController {
 
 	@DeleteMapping("/note/{id}")
 	public ResponseEntity<?> deleteNote(@PathVariable String id) {
+		statsDClient.incrementCounter("endpoint.note.api.delete");
 		Map<String, String> map = new HashMap<String, String>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -157,6 +159,7 @@ public class NoteRestController {
 
 	@PutMapping("/note/{id}")
 	public ResponseEntity<?> updateNote(@Valid @RequestBody Note note, BindingResult result, @PathVariable String id) {
+		statsDClient.incrementCounter("endpoint.note.api.put");
 		Map<String, String> map = new HashMap<String, String>();
 		if(result.hasErrors()) {
 			StringJoiner sj = new StringJoiner(", ");
