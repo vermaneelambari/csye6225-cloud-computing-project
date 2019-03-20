@@ -11,6 +11,9 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import com.timgroup.statsd.NoOpStatsDClient;
+import com.timgroup.statsd.NonBlockingStatsDClient;
+import com.timgroup.statsd.StatsDClient;
 
 
 @Configuration
@@ -54,6 +57,24 @@ public class AmazonS3Config {
 	@Bean(name = "awsS3AudioBucket")
 	public String getAwsS3AudioBucket() {
 		return awsS3AudioBucket;
+	}
+	
+	@Value("${metrics.publish}")
+	public boolean metricsPublish;
+	
+	@Value("${metrics.server.hostname}")
+	public String metricsHostName;
+	
+	@Value("${metrics.server.port}")
+	public int metricsPort;
+	
+	@Bean(name = "metricsClient")
+	public StatsDClient statsDClient() {
+		if(metricsPublish) {
+			return new NonBlockingStatsDClient("csye6225", metricsHostName, metricsPort);
+		}
+		
+		return new NoOpStatsDClient();
 	}
 	
 	
