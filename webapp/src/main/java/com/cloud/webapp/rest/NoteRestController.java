@@ -30,6 +30,7 @@ import com.cloud.webapp.service.CloudwatchService;
 import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 
 @RestController
 public class NoteRestController {
@@ -37,19 +38,19 @@ public class NoteRestController {
 	private NoteService noteService;
 	private UserService userService;
 	private FileUploadService fileUploadService;
-	private CloudwatchService cloudwatchService;
+	private StatsDClient statsDClient;
 
 	@Autowired
-	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService, CloudwatchService theCloudwatchService) {
+	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService, StatsDClient theStatsDClient) {
 		noteService = theNoteService;
 		userService = theUerService;
 		fileUploadService = theFileUploadService;
-		cloudwatchService = theCloudwatchService;
+		statsDClient = theStatsDClient;
 	}
 
 	@GetMapping("/note")
 	public List<Note> findAll() {
-		cloudwatchService.metricsClient().incrementCounter("hi");
+		statsDClient.incrementCounter("hi");
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
