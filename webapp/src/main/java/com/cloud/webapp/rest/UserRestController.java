@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cloud.webapp.entity.User;
 import com.cloud.webapp.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 
 
 
@@ -25,10 +26,13 @@ import com.cloud.webapp.service.UserService;
 public class UserRestController {
 
 	private UserService userService;
+	
+	private StatsDClient statsDClient;
 
 	@Autowired
-	public UserRestController(UserService theUserService) {
+	public UserRestController(UserService theUserService, StatsDClient metricsClient) {
 		userService = theUserService;
+		statsDClient = metricsClient;
 	}
 
 	@GetMapping("/users")
@@ -38,6 +42,7 @@ public class UserRestController {
 
 	@GetMapping("/")
 	public ResponseEntity<?> baseUrl() {
+		statsDClient.incrementCounter("endpoint.user.get");
 		Date date = new Date();
 		Map<String, String> map = new HashMap<>();
 		map.put("Current Date/Time", date.toString());
@@ -46,7 +51,7 @@ public class UserRestController {
 
 	@PostMapping("/user/register")
 	public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
-
+		statsDClient.incrementCounter("endpoint.user.register.post");
 		if (result.hasErrors()) {
 			String error = "";
 			if (result.getFieldError("email") != null) {
