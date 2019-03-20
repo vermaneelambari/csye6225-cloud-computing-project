@@ -20,7 +20,7 @@ public class CloudwatchMetricsConfig {
 	@Value("${metrics.server.port}")
 	public int metricsPort;
 	
-	@Bean(name="metricsClient")
+	@Bean
 	public StatsDClient metricsClient() {
 		if(metricsPublish) {
 			return new NonBlockingStatsDClient("csye6225", metricsHostName, metricsPort);
