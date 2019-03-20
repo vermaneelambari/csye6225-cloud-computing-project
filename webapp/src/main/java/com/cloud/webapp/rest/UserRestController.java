@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cloud.webapp.entity.User;
+import com.cloud.webapp.service.CloudwatchService;
 import com.cloud.webapp.service.UserService;
 import com.timgroup.statsd.StatsDClient;
 
@@ -30,9 +31,9 @@ public class UserRestController {
 	private StatsDClient statsDClient;
 
 	@Autowired
-	public UserRestController(UserService theUserService, StatsDClient statsDClient) {
+	public UserRestController(UserService theUserService, CloudwatchService cloudwatchService) {
 		userService = theUserService;
-		this.statsDClient = statsDClient;
+		this.statsDClient = cloudwatchService.metricsClient();
 	}
 
 	@GetMapping("/users")
