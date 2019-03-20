@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cloud.webapp.entity.Attachment;
 import com.cloud.webapp.entity.Note;
 import com.cloud.webapp.entity.User;
+import com.cloud.webapp.service.CloudwatchService;
 import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
@@ -36,16 +37,19 @@ public class NoteRestController {
 	private NoteService noteService;
 	private UserService userService;
 	private FileUploadService fileUploadService;
+	private CloudwatchService cloudwatchService;
 
 	@Autowired
-	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService) {
+	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService, CloudwatchService theCloudwatchService) {
 		noteService = theNoteService;
 		userService = theUerService;
 		fileUploadService = theFileUploadService;
+		cloudwatchService = theCloudwatchService;
 	}
 
 	@GetMapping("/note")
 	public List<Note> findAll() {
+		cloudwatchService.metricsClient().incrementCounter("hi");
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
