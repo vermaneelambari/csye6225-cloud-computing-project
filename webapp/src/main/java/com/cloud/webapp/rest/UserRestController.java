@@ -27,12 +27,12 @@ public class UserRestController {
 
 	private UserService userService;
 	
-	@Autowired
 	private StatsDClient statsDClient;
 
 	@Autowired
-	public UserRestController(UserService theUserService) {
+	public UserRestController(UserService theUserService, StatsDClient statsDClient) {
 		userService = theUserService;
+		this.statsDClient = statsDClient;
 	}
 
 	@GetMapping("/users")
