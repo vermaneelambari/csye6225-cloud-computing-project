@@ -27,7 +27,7 @@ import com.timgroup.statsd.StatsDClient;
 public class UserRestController {
 
 	private UserService userService;
-	//private StatsDClient statsDClient;
+	//private StatsDClient statsDClient; 
 
 
 	@Autowired

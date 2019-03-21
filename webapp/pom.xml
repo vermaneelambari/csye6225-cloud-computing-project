@@ -17,7 +17,6 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<start-class>com.cloud.webapp.WebappApplication</start-class>
 		<java.version>1.8</java.version>
 	</properties>
 
