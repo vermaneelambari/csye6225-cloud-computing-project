@@ -6,7 +6,7 @@ sudo rm -rf /opt/tomcat/webapps/docs  /opt/tomcat/webapps/examples /opt/tomcat/w
 
 sudo chown tomcat:tomcat /opt/tomcat/webapps/ROOT.war
 
-sudo cp cloudwatch-config.json /opt/aws/amazon-cloudwatch-agent/bin/
+#sudo cp infrastructure/aws/cloudformation/cloudwatch-config.json /opt/aws/amazon-cloudwatch-agent/bin/
 
 # cleanup log files
 sudo rm -rf /opt/tomcat/logs/catalina*
