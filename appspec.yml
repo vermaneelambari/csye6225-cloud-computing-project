@@ -4,6 +4,8 @@ os: linux
 files:             
   - source: ./webapp/target/ROOT.war
     destination: /opt/tomcat/webapps
+  - source: ./infrastructure/aws/cloudformation/cloudwatch-config.json
+    destination: /opt/aws/amazon-cloudwatch-agent/bin/
 hooks:
   AfterInstall:
    - location: ./afterInstall.sh

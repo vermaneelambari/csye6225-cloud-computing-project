@@ -35,22 +35,17 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     private TransferManager tm;
     private static final Logger logger = LoggerFactory.getLogger(AmazonS3FileUploadServiceImpl.class);
     
-   // @Autowired
+   @Autowired
     public AmazonS3FileUploadServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsS3AudioBucket) 
     {
-    	logger.info("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
-    	logger.info("InstanceCredentials : secret: "+awsCredentialsProvider.getCredentials().getAWSSecretKey());
-    	logger.info("AWS Bucket Name: "+awsS3AudioBucket);
-    	System.out.println("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());
     	 this.amazonS3 = AmazonS3ClientBuilder.standard()
     			 .withCredentials(awsCredentialsProvider)
     			 .withRegion(awsRegion.getName())
     			 .build();
-    	 logger.info("AmazonS3 client created: "+ this.amazonS3.toString());
+
          this.tm = TransferManagerBuilder.standard()
         		.withS3Client(this.amazonS3)
         		.build();
-         logger.info("TransferManagerBuilder created: "+ this.tm.toString());
         this.awsS3AudioBucket = awsS3AudioBucket;
     }
 
