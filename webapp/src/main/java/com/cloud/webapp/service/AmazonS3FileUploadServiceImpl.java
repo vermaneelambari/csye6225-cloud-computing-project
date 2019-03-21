@@ -35,7 +35,7 @@ public class AmazonS3FileUploadServiceImpl implements FileUploadService {
     private TransferManager tm;
     private static final Logger logger = LoggerFactory.getLogger(AmazonS3FileUploadServiceImpl.class);
     
-   // @Autowired
+   @Autowired
     public AmazonS3FileUploadServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsS3AudioBucket) 
     {
     	logger.info("InstanceCredentials : key: "+awsCredentialsProvider.getCredentials().getAWSAccessKeyId());

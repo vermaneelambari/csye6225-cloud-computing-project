@@ -32,6 +32,7 @@ import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.AttachmentService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 
 @RestController
 @RequestMapping("/note")
@@ -41,18 +42,21 @@ public class NoteAttachmentController {
 	private AttachmentService attachmentService;
 	private NoteService noteService;
 	private UserService userService;
+	private StatsDClient statsDClient;
 
 	@Autowired
 	public NoteAttachmentController(FileUploadService amazonS3ClientService, NoteService theNoteService,
-			UserService theUerService, AttachmentService attachmentService) {
+			UserService theUerService, AttachmentService attachmentService, StatsDClient theStatsDClient) {
 		this.fileUploadService = amazonS3ClientService;
 		this.attachmentService = attachmentService;
 		this.noteService = theNoteService;
 		this.userService = theUerService;
+		this.statsDClient = theStatsDClient;
 	}
 	
 	@GetMapping("/{id}/attachments")
 	public ResponseEntity<?> getAllAttachments(@PathVariable String id){
+		statsDClient.incrementCounter("endpoint.attachment.api.get");
 		Map<String, String> map = new HashMap<>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -81,6 +85,7 @@ public class NoteAttachmentController {
 
 	@PostMapping("/{id}/attachments")
 	public ResponseEntity<?> uploadFile(@PathVariable String id, @Valid @RequestPart(value = "file") MultipartFile file) {
+		statsDClient.incrementCounter("endpoint.attachment.api.post");
 		Map<String, String> map = new HashMap<>();
 
 		// If file is not attached
@@ -127,6 +132,7 @@ public class NoteAttachmentController {
 	
 	@DeleteMapping("/{id}/attachments/{attachmentId}")
 	public ResponseEntity<?> deleteAttachment(@PathVariable String id, @PathVariable String attachmentId){
+		statsDClient.incrementCounter("endpoint.attachment.api.delete");
 		Map<String, String> map = new HashMap<>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -180,6 +186,7 @@ public class NoteAttachmentController {
 	
 	@PutMapping("/{id}/attachments/{attachmentId}")
 	public ResponseEntity<?> updateAttachment(@PathVariable String id,  @PathVariable String attachmentId, @Valid @RequestPart(value = "file") MultipartFile file){
+		statsDClient.incrementCounter("endpoint.attachment.api.put");
 		Map<String, String> map = new HashMap<>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();

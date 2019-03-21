@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cloud.webapp.entity.Attachment;
 import com.cloud.webapp.entity.Note;
 import com.cloud.webapp.entity.User;
+import com.cloud.webapp.service.CloudwatchService;
 import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
+import com.timgroup.statsd.StatsDClient;
 
 @RestController
 public class NoteRestController {
@@ -36,16 +38,19 @@ public class NoteRestController {
 	private NoteService noteService;
 	private UserService userService;
 	private FileUploadService fileUploadService;
+	private StatsDClient statsDClient;
 
 	@Autowired
-	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService) {
+	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService, StatsDClient theStatsDClient) {
 		noteService = theNoteService;
 		userService = theUerService;
 		fileUploadService = theFileUploadService;
+		statsDClient = theStatsDClient;
 	}
 
 	@GetMapping("/note")
 	public List<Note> findAll() {
+		statsDClient.incrementCounter("endpoint.note.api.get");
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
@@ -56,6 +61,7 @@ public class NoteRestController {
 
 	@GetMapping(path = "/note/{id}")
 	public ResponseEntity<?> findOne(@PathVariable String id) {
+		statsDClient.incrementCounter("endpoint.note.api.get");
 		Map<String, String> map = new HashMap<>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -83,7 +89,7 @@ public class NoteRestController {
 
 	@PostMapping("/note")
 	public ResponseEntity<?> createNote(@Valid @RequestBody Note note, BindingResult result) {
-		
+		statsDClient.incrementCounter("endpoint.note.api.post");
 		if(result.hasErrors()) {
 			StringJoiner sj = new StringJoiner(", ");
 			for(ObjectError objError : result.getAllErrors()) {
@@ -112,6 +118,7 @@ public class NoteRestController {
 
 	@DeleteMapping("/note/{id}")
 	public ResponseEntity<?> deleteNote(@PathVariable String id) {
+		statsDClient.incrementCounter("endpoint.note.api.delete");
 		Map<String, String> map = new HashMap<String, String>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -152,6 +159,7 @@ public class NoteRestController {
 
 	@PutMapping("/note/{id}")
 	public ResponseEntity<?> updateNote(@Valid @RequestBody Note note, BindingResult result, @PathVariable String id) {
+		statsDClient.incrementCounter("endpoint.note.api.put");
 		Map<String, String> map = new HashMap<String, String>();
 		if(result.hasErrors()) {
 			StringJoiner sj = new StringJoiner(", ");
