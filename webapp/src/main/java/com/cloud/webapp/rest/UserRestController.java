@@ -27,14 +27,14 @@ import com.timgroup.statsd.StatsDClient;
 public class UserRestController {
 
 	private UserService userService;
-	//private StatsDClient statsDClient; 
+	private StatsDClient statsDClient; 
 
 
 	@Autowired
 	public UserRestController(UserService theUserService) {
 		userService = theUserService;
 		//statsDClient = theStatsDClient;
-		//statsDClient = new NonBlockingStatsDClient("csye6225", "localhost", 8125);
+		statsDClient = new NonBlockingStatsDClient("csye6225", "localhost", 8125);
 	}
 
 	@GetMapping("/users")
@@ -44,7 +44,7 @@ public class UserRestController {
 
 	@GetMapping("/")
 	public ResponseEntity<?> baseUrl() {
-		//statsDClient.incrementCounter("endpoint.user.get");
+		statsDClient.incrementCounter("endpoint.user.api.get");
 		Date date = new Date();
 		Map<String, String> map = new HashMap<>();
 		map.put("Current Date/Time", date.toString());
@@ -53,7 +53,7 @@ public class UserRestController {
 
 	@PostMapping("/user/register")
 	public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
-		//statsDClient.incrementCounter("endpoint.user.register.post");
+		statsDClient.incrementCounter("endpoint.user.api.post");
 		if (result.hasErrors()) {
 			String error = "";
 			if (result.getFieldError("email") != null) {
