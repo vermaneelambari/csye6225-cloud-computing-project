@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cloud.webapp.entity.Attachment;
 import com.cloud.webapp.entity.Note;
 import com.cloud.webapp.entity.User;
-import com.cloud.webapp.service.CloudwatchService;
 import com.cloud.webapp.service.FileUploadService;
 import com.cloud.webapp.service.NoteService;
 import com.cloud.webapp.service.UserService;
@@ -39,6 +40,7 @@ public class NoteRestController {
 	private UserService userService;
 	private FileUploadService fileUploadService;
 	private StatsDClient statsDClient;
+	private static final Logger logger = LoggerFactory.getLogger(NoteRestController.class);
 
 	@Autowired
 	public NoteRestController(NoteService theNoteService, UserService theUerService, FileUploadService theFileUploadService, StatsDClient theStatsDClient) {
@@ -51,6 +53,7 @@ public class NoteRestController {
 	@GetMapping("/note")
 	public List<Note> findAll() {
 		statsDClient.incrementCounter("endpoint.note.api.get");
+		logger.info("endpoint.note.api.get hit successfully");
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
 		User user = userService.findByEmail(email);
@@ -62,6 +65,7 @@ public class NoteRestController {
 	@GetMapping(path = "/note/{id}")
 	public ResponseEntity<?> findOne(@PathVariable String id) {
 		statsDClient.incrementCounter("endpoint.note.api.get");
+		logger.info("endpoint.note.api.get hit successfully");
 		Map<String, String> map = new HashMap<>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -71,25 +75,30 @@ public class NoteRestController {
 			note = noteService.findById(id);
 			if (note == null) {
 				map.put("Failure", "Key not found");
+				logger.warn("Note with id "+id+" not found");
 				return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 			}
 
 			if (note.getUser() != user) {
 				map.put("Error", "You are not authenticated");
+				logger.warn("User is not authenticted");
 				return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
 			}
 		} catch (Exception e) {
 			map.put("Error", e.getMessage());
+			logger.error(e.getMessage());
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 
 		map.put(id, note.toString());
+		logger.info("Note with id "+id+" found successfully");
 		return new ResponseEntity<>(note, HttpStatus.OK);
 	}
 
 	@PostMapping("/note")
 	public ResponseEntity<?> createNote(@Valid @RequestBody Note note, BindingResult result) {
 		statsDClient.incrementCounter("endpoint.note.api.post");
+		logger.info("endpoint.note.api.post hit successfully");
 		if(result.hasErrors()) {
 			StringJoiner sj = new StringJoiner(", ");
 			for(ObjectError objError : result.getAllErrors()) {
@@ -97,6 +106,7 @@ public class NoteRestController {
 			}
 			Map<String, String> map = new HashMap<>();
 			map.put("Error", sj.toString());
+			logger.warn(sj.toString());
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 		SecurityContext context = SecurityContextHolder.getContext();
@@ -108,9 +118,11 @@ public class NoteRestController {
 		try {
 			Note savedNote = noteService.save(note);
 			map.put("Success", "Note created successfully with id: " + note.getId());
+			logger.info("Note with created successfully");
 			return new ResponseEntity<>(savedNote, HttpStatus.CREATED);
 		} catch (Exception e) {
 			map.put("Error", "bad Request");
+			logger.error(e.getMessage());
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 
@@ -119,6 +131,7 @@ public class NoteRestController {
 	@DeleteMapping("/note/{id}")
 	public ResponseEntity<?> deleteNote(@PathVariable String id) {
 		statsDClient.incrementCounter("endpoint.note.api.delete");
+		logger.info("endpoint.note.api.delete hit successfully");
 		Map<String, String> map = new HashMap<String, String>();
 		SecurityContext context = SecurityContextHolder.getContext();
 		String email = context.getAuthentication().getName();
@@ -130,11 +143,13 @@ public class NoteRestController {
 
 			if (note == null) {
 				map.put("Failure", "Key not found");
+				logger.warn("Note with id "+id+" not found");
 				return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 			}
 
 			if (note.getUser() != user) {
 				map.put("Error", "You are not authenticated");
+				logger.warn("User is not authenticted");
 				return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
 			}
 			for(Attachment attachment: note.getAttachments()) {
@@ -144,6 +159,7 @@ public class NoteRestController {
 			status = noteService.delete(id);
 		} catch (Exception ex) {
 			map.put("Error", ex.getMessage());
+			logger.error(ex.getMessage());
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 
@@ -153,6 +169,7 @@ public class NoteRestController {
 		}
 
 		map.put("Success", "Record deleted successfully");
+		logger.info("Note with id "+id+" deleted successfully");
 		return new ResponseEntity<>(map, HttpStatus.NO_CONTENT);
 
 	}
@@ -160,6 +177,7 @@ public class NoteRestController {
 	@PutMapping("/note/{id}")
 	public ResponseEntity<?> updateNote(@Valid @RequestBody Note note, BindingResult result, @PathVariable String id) {
 		statsDClient.incrementCounter("endpoint.note.api.put");
+		logger.info("endpoint.note.api.put hit successfully");
 		Map<String, String> map = new HashMap<String, String>();
 		if(result.hasErrors()) {
 			StringJoiner sj = new StringJoiner(", ");
@@ -180,11 +198,13 @@ public class NoteRestController {
 
 			if (updatedNote == null) {
 				map.put("Failure", "Key not found");
+				logger.warn("Note with id "+id+" not found");
 				return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 			}
 
 			if (updatedNote.getUser() != user) {
 				map.put("Error", "You are not authenticated");
+				logger.warn("User is not authenticted");
 				return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
 			}
 
@@ -192,10 +212,12 @@ public class NoteRestController {
 			
 		} catch (Exception ex) {
 			map.put("Error", ex.getMessage());
+			logger.error(ex.getMessage());
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 
 		map.put("Success", "Record updated successfully");
+		logger.info("Note with id "+id+" updated successfully");
 		return new ResponseEntity<>(map, HttpStatus.NO_CONTENT);
 	}
 }

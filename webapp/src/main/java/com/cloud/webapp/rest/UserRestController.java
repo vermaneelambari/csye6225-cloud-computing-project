@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cloud.webapp.entity.User;
+import com.cloud.webapp.service.AmazonS3FileUploadServiceImpl;
 import com.cloud.webapp.service.UserService;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
@@ -28,7 +31,7 @@ public class UserRestController {
 
 	private UserService userService;
 	private StatsDClient statsDClient; 
-
+	private static final Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
 	@Autowired
 	public UserRestController(UserService theUserService) {
@@ -44,6 +47,7 @@ public class UserRestController {
 	@GetMapping("/")
 	public ResponseEntity<?> baseUrl() {
 		statsDClient.incrementCounter("endpoint.user.api.get");
+		logger.info("endpoint.user.api.get hit successfully");
 		Date date = new Date();
 		Map<String, String> map = new HashMap<>();
 		map.put("Current Date/Time", date.toString());
@@ -53,6 +57,7 @@ public class UserRestController {
 	@PostMapping("/user/register")
 	public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
 		statsDClient.incrementCounter("endpoint.user.api.post");
+		logger.info("endpoint.user.api.post hit successfully");
 		if (result.hasErrors()) {
 			String error = "";
 			if (result.getFieldError("email") != null) {
@@ -64,17 +69,20 @@ public class UserRestController {
 			}
 			Map<String, String> map = new HashMap<>();
 			map.put("Error", error);
+			logger.warn(error);
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 		if (userService.findByEmail(user.getEmail()) != null) {
 			Map<String, String> map = new HashMap<>();
 			map.put("Error", "User already exists");
+			logger.warn("User already exists");
 			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
 		}
 		user.setId(0);
 		userService.save(user);
 		Map<String, String> map = new HashMap<>();
 		map.put("Success", "User created successfully");
+		logger.info("User created successfully");
 		return new ResponseEntity<>(map, HttpStatus.CREATED);
 
 	}
