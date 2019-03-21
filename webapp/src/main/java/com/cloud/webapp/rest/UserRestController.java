@@ -33,7 +33,6 @@ public class UserRestController {
 	@Autowired
 	public UserRestController(UserService theUserService) {
 		userService = theUserService;
-		//statsDClient = theStatsDClient;
 		statsDClient = new NonBlockingStatsDClient("csye6225", "localhost", 8125);
 	}
 
