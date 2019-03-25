@@ -37,10 +37,10 @@ public class UserRestController {
 	private static final Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
 	@Autowired
-	public UserRestController(UserService theUserService, AmazonSNSService theSnsService) {
+	public UserRestController(UserService theUserService, AmazonSNSService theSnsService, StatsDClient theStatsDClient) {
 		userService = theUserService;
 		snsService = theSnsService;
-		statsDClient = new NonBlockingStatsDClient("csye6225", "localhost", 8125);
+		statsDClient = theStatsDClient;
 	}
 
 	@GetMapping("/users")
