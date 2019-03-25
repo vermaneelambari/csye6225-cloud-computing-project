@@ -31,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.csrf().disable().authorizeRequests().antMatchers("/user/register").permitAll().anyRequest().authenticated()
+		http.csrf().disable().authorizeRequests().antMatchers("/user/register").permitAll().antMatchers("/reset").permitAll().anyRequest().authenticated()
 				.and().httpBasic().realmName("Cloud Realm").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
