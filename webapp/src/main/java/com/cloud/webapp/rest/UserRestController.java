@@ -119,8 +119,8 @@ public class UserRestController {
 		}
 		
 		snsService.publish(emailaddress);
-		logger.info("SNS messages published from Rest Controller");
-		map.put("Success", "SNS messages published from Rest Controller");
-		return new ResponseEntity<>(map, HttpStatus.CREATED);
+		logger.info("SNS message published from Rest Controller for email: " + emailaddress);
+		//map.put("Success", "SNS messages published from Rest Controller");
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 }
