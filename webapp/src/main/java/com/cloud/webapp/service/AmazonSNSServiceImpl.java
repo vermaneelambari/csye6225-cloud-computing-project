@@ -27,8 +27,8 @@ public class AmazonSNSServiceImpl implements AmazonSNSService {
 	private String snsTopic;
 	
 	@Autowired
-	public AmazonSNSServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String awsSNSTopic) {
-		snsTopic = awsSNSTopic;
+	public AmazonSNSServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String snsTopic) {
+		this.snsTopic = snsTopic;
 		logger.info("SNS topic is "+ snsTopic);
 		snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard()
 				.withCredentials(awsCredentialsProvider)
