@@ -40,6 +40,10 @@
       "Description": "code deploy application name",
       "Type": "String",
       "Default": "csye6225-webapp"
+    },
+    "domain": {
+      "Description": "Domain Name",
+      "Type": "String"
     }
   },
   "Resources": {
@@ -121,6 +125,18 @@
                         ]
                       },
                       ":3306/csye6225\"' >> setenv.sh \n"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "sudo echo 'JAVA_OPTS=\"$JAVA_OPTS -Daws.sns.topic=reset_password_",
+                      {
+                        "Ref": "stackname"
+                      },
+                      "\"' >> setenv.sh \n"
                     ]
                   ]
                 },
@@ -410,6 +426,7 @@
         }
       }
     },
+
  "ourSNSTopic": {
       "Type": "AWS::SNS::Topic",
       "Properties": {
@@ -484,6 +501,86 @@
         "Timeout": 300,
         "MemorySize": 256
       }
+
+    },
+    "ourLambdaResourcePolicy": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ourLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "sns.amazonaws.com",
+        "Action": "lambda:InvokeFunction",
+        "SourceArn": {
+          "Ref": "ourSNSTopic"
+        }
+      }
+    },
+    "ourCircleCiLambdaPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "DependsOn": "ourLambdaFunction",
+      "Properties": {
+        "ManagedPolicyName": "CircleCiLambdaPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "lambda:UpdateFunctionCode",
+                "lambda:GetFunction",
+                "lambda:UpdateFunctionConfiguration"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ourLambdaFunction",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Users": [
+          "circleci"
+        ]
+      }
+    },
+    "ourEC2SNSPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "DependsOn": "ourSNSTopic",
+      "Properties": {
+        "ManagedPolicyName": "EC2SNSPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sns:Publish"
+              ],
+              "Resource": [
+                {
+                  "Ref": "ourSNSTopic"
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": "sns:ListTopics",
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [
+          "CodeDeployEC2ServiceRole"
+        ]
+      }
+
     }
   }
 }
