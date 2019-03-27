@@ -426,7 +426,8 @@
         }
       }
     },
-    "ourSNSTopic": {
+
+ "ourSNSTopic": {
       "Type": "AWS::SNS::Topic",
       "Properties": {
         "TopicName": {
@@ -500,6 +501,7 @@
         "Timeout": 300,
         "MemorySize": 256
       }
+
     },
     "ourLambdaResourcePolicy": {
       "Type": "AWS::Lambda::Permission",
@@ -578,6 +580,7 @@
           "CodeDeployEC2ServiceRole"
         ]
       }
+
     }
   }
 }
