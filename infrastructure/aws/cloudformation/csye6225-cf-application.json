@@ -409,6 +409,81 @@
           }
         }
       }
+    },
+ "ourSNSTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "TopicName": {
+          "Fn::Join": [
+            "",
+            [
+              "reset_password_",
+              {
+                "Ref": "stackname"
+              }
+            ]
+          ]
+        },
+        "Subscription": [
+          {
+            "Endpoint": {
+              "Fn::GetAtt": [
+                "ourLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Protocol": "lambda"
+          }
+        ]
+      },
+      "DependsOn": "ourLambdaFunction"
+    },
+    "ourLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": "ResetPassword",
+        "Handler": "com.cloud.lambda.ResetPassword::handleRequest",
+        "Role": {
+          "Fn::ImportValue": {
+            "Fn::Join": [
+              "-",
+              [
+                {
+                  "Ref": "cicdstack"
+                },
+                "LambdaRoleArn"
+              ]
+            ]
+          }
+        },
+        "Code": {
+          "ZipFile": {
+            "Fn::Join": [
+              "",
+              [
+                "var response = require('cfn-response');",
+                "exports.handler = function(event, context) {",
+                "  var input = parseInt(event.ResourceProperties.Input);",
+                "  var responseData = {Value: input * 5};",
+                "  response.send(event, context, response.SUCCESS, responseData);",
+                "};"
+              ]
+            ]
+          }
+        },
+        "Environment": {
+          "Variables": {
+            "DOMAIN_NAME": {
+              "Ref": "domain"
+            },
+            "DYNAMODB_TABLE_NAME": "csye6225",
+            "TTL": 20
+          }
+        },
+        "Runtime": "nodejs8.10",
+        "Timeout": 300,
+        "MemorySize": 256
+      }
     }
   }
 }
