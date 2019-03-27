@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cloud.webapp.entity.Email;
 import com.cloud.webapp.entity.User;
 import com.cloud.webapp.service.AmazonS3FileUploadServiceImpl;
+import com.cloud.webapp.service.AmazonSNSService;
 import com.cloud.webapp.service.UserService;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
@@ -31,12 +33,14 @@ public class UserRestController {
 
 	private UserService userService;
 	private StatsDClient statsDClient; 
+	private AmazonSNSService snsService;
 	private static final Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
 	@Autowired
-	public UserRestController(UserService theUserService) {
+	public UserRestController(UserService theUserService, AmazonSNSService theSnsService, StatsDClient theStatsDClient) {
 		userService = theUserService;
-		statsDClient = new NonBlockingStatsDClient("csye6225", "localhost", 8125);
+		snsService = theSnsService;
+		statsDClient = theStatsDClient;
 	}
 
 	@GetMapping("/users")
@@ -85,5 +89,38 @@ public class UserRestController {
 		logger.info("User created successfully");
 		return new ResponseEntity<>(map, HttpStatus.CREATED);
 
+	}
+	
+	@PostMapping("/reset")
+	public ResponseEntity<?> passwordReset(@Valid @RequestBody Email email, BindingResult result){
+		statsDClient.incrementCounter("endpoint.reset.api.post");
+		logger.info("endpoint.reset.api.post hit successfully");
+		Map<String, String> map = new HashMap<>();
+		
+		if (result.hasErrors()) {
+			String error = "";
+			if (result.getFieldError("email") != null) {
+				error = result.getFieldError("email").getDefaultMessage();
+			} else {
+				error = "Bad Request";
+			}
+			map.put("Error", error);
+			logger.warn(error);
+			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+		}
+		
+		String emailaddress = email.getEmail();
+		User user = userService.findByEmail(emailaddress);
+		
+		if(user == null) {
+			map.put("Error", "User does not exist for the given email address");
+			logger.warn("User does not exist for the given email address: " + emailaddress);
+			return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+		}
+		
+		snsService.publish(emailaddress);
+		logger.info("SNS message published from Rest Controller for email: " + emailaddress);
+		//map.put("Success", "SNS messages published from Rest Controller");
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 }
