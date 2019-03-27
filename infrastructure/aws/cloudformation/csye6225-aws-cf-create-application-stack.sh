@@ -36,6 +36,7 @@ if [ $ami_id_status -eq 0 ]; then
 	echo $DNS
 	bucket_name="${DNS}.csye6225.com"
 	echo $bucket_name
+	codedeploy_bucketname="code-deploy.${DNS}"
 	ec2tagfilter="webappEC2"
 	echo $ec2tagfilter
 	#cdappname="csye6225-webapp"
@@ -43,7 +44,7 @@ if [ $ami_id_status -eq 0 ]; then
 	dns_id_status=$? 
 	if [ $dns_id_status -eq 0 ]; then
 	  
-	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stackname ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack )
+	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stack_name ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack ParameterKey=domain,ParameterValue=$DNS)
 	  echo $createOutput
 
 	  if [ $? -eq 0 ]; then
