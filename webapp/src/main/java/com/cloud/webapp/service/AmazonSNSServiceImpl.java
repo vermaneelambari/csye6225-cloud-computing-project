@@ -24,11 +24,12 @@ public class AmazonSNSServiceImpl implements AmazonSNSService {
 	private AmazonSNSClient snsClient;
 	private static final Logger logger = LoggerFactory.getLogger(AmazonSNSServiceImpl.class);
 	
-	@Value("${aws.sns.topic}")
 	private String snsTopic;
 	
 	@Autowired
-	public AmazonSNSServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider) {
+	public AmazonSNSServiceImpl(Region awsRegion, AWSCredentialsProvider awsCredentialsProvider, String snsTopic) {
+		this.snsTopic = snsTopic;
+		logger.info("SNS topic is "+ snsTopic);
 		snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard()
 				.withCredentials(awsCredentialsProvider)
 				.withRegion(awsRegion.getName())
