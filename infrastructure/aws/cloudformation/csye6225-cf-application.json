@@ -44,6 +44,10 @@
     "domain": {
       "Description": "Domain Name",
       "Type": "String"
+    },
+    "codedeploybucketname": {
+      "Description": "Lambda Bucket Name",
+      "Type": "String"
     }
   },
   "Resources": {
@@ -474,19 +478,10 @@
           }
         },
         "Code": {
-          "ZipFile": {
-            "Fn::Join": [
-              "",
-              [
-                "var response = require('cfn-response');",
-                "exports.handler = function(event, context) {",
-                "  var input = parseInt(event.ResourceProperties.Input);",
-                "  var responseData = {Value: input * 5};",
-                "  response.send(event, context, response.SUCCESS, responseData);",
-                "};"
-              ]
-            ]
-          }
+          "S3Bucket": {
+            "Ref": "codedeploybucketname"
+          },
+          "S3Key": "LAMBDA.jar"
         },
         "Environment": {
           "Variables": {
@@ -497,7 +492,7 @@
             "TTL": 20
           }
         },
-        "Runtime": "nodejs8.10",
+        "Runtime": "java8",
         "Timeout": 300,
         "MemorySize": 256
       }
