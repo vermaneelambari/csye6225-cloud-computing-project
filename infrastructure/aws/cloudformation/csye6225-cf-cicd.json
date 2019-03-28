@@ -374,11 +374,6 @@
                 "RoleName": {
                     "Ref": "LambdaRoleName"
                 },
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-                    "arn:aws:iam::aws:policy/AmazonSESFullAccess",
-                    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
-                ],
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
                     "Statement": [
