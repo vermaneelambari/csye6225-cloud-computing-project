@@ -22,36 +22,36 @@ import com.cloud.webapp.rest.UserRestController;
 import com.cloud.webapp.service.UserService;
 
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(value = UserRestController.class)
+//@RunWith(SpringRunner.class)
+//@WebMvcTest(value = UserRestController.class)
 public class WebappApplicationRestLayerUnitTests {
 
-	@Autowired
-	private MockMvc mockMvc;
-	
-	@MockBean
-	private UserService userService;
-	
-	User mockUser = new User(0, "nishad@gmail.com", "Nishad@1234");
-
-	String exampleUser = "{\"id\":\"0\",\"email\":\"nishad@gmail.com\",\"password\":\"Nishad@1234\"}";
-
-	@Test
-	public void CheckIfExists() throws Exception{
-		
-		Mockito.when(
-				userService.findByEmail(Mockito.anyString())).thenReturn(mockUser);
-
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
-				"/user/register").accept(MediaType.APPLICATION_JSON).content(exampleUser).contentType(
-				MediaType.APPLICATION_JSON);
-		
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-		System.out.println(result.getResponse());
-				
-		MockHttpServletResponse response = result.getResponse();
-		assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-	}
+//	@Autowired
+//	private MockMvc mockMvc;
+//	
+//	@MockBean
+//	private UserService userService;
+//	
+//	User mockUser = new User(0, "nishad@gmail.com", "Nishad@1234");
+//
+//	String exampleUser = "{\"id\":\"0\",\"email\":\"nishad@gmail.com\",\"password\":\"Nishad@1234\"}";
+//
+//	@Test
+//	public void CheckIfExists() throws Exception{
+//		
+//		Mockito.when(
+//				userService.findByEmail(Mockito.anyString())).thenReturn(mockUser);
+//
+//		RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+//				"/user/register").accept(MediaType.APPLICATION_JSON).content(exampleUser).contentType(
+//				MediaType.APPLICATION_JSON);
+//		
+//		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+//		System.out.println(result.getResponse());
+//				
+//		MockHttpServletResponse response = result.getResponse();
+//		assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+//	}
 
 }
 

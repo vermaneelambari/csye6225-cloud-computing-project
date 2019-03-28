@@ -37,6 +37,9 @@
         },
         "bucketname": {
             "Type": "String"
+        },
+        "LambdaRoleName": {
+            "Type": "String"
         }
     },
     "Resources": {
@@ -364,6 +367,30 @@
                     "circleci"
                 ]
             }
+        },
+        "ourLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Ref": "LambdaRoleName"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                }
+            }
         }
     },
     "Outputs": {
@@ -378,6 +405,34 @@
             "Export": {
                 "Name": {
                     "Fn::Sub": "${AWS::StackName}-CodeDeployServiceRoleArn"
+                }
+            }
+        },
+        "CodeDeployEC2ServiceRoleArn": {
+            "Description": "Code Deploy Arn",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ourCodeDeployEC2ServiceRole",
+                    "Arn"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CodeDeployEC2ServiceRoleArn"
+                }
+            }
+        },
+        "LambdaRoleArn": {
+            "Description": "Lambda Role Arn",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ourLambdaRole",
+                    "Arn"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-LambdaRoleArn"
                 }
             }
         }

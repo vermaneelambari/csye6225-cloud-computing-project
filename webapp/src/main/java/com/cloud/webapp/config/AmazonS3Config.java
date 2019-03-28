@@ -28,6 +28,9 @@ public class AmazonS3Config {
 	
 	@Value("${aws.s3.audio.bucket}")
 	private String awsS3AudioBucket;
+	
+	@Value("${aws.sns.topic}")
+	private String awsSNSTopic;
 //	
 	@Bean(name = "awsCredentialsProvider")
 	public AWSCredentialsProvider getAWSCredentials() {
@@ -46,6 +49,12 @@ public class AmazonS3Config {
 //		return awsKeySecret;
 //	}
 //
+	
+	@Bean(name = "snsTopic")
+	public String getAwsSNSTopic() {
+		return awsSNSTopic;
+	}
+	
 	@Bean(name = "awsRegion")
 	public Region getAwsRegion() {
 		return Region.getRegion(Regions.fromName(awsRegion));
