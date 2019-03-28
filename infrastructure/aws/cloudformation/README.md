@@ -12,4 +12,32 @@ Example command: ./csye6225-aws-cf-create-stack.sh myStack 10.0.0.0/16 subnet1 1
 
 Example command: ./csye6225-aws-cf-terminate-stack.sh myStack
 
-#changes done for ci cd
+
+## Instructions to Run Shell Script to Setup CICD Stack with AWS CloudFormation:
+- This stack is used to created circleCI user and related policies and roles
+- The application script is provided in the file csye6225-aws-cf-create-cicd-stack.sh
+- Open Terminal and Navigate to infrastructure/aws/cloud_formation folder that has the above script file and run the script
+- Following parameters are expected while running the script:[cicd_stack_name]
+
+Example command: ./csye6225-aws-cf-create-cicd-stack.sh cicdStack
+
+## Instructions to Run Shell Script to Teardown CICD Stack with AWS CloudFormation:
+- The teardown script is provided in the file csye6225-aws-cf-terminate-cicd-stack.sh
+- Open Terminal and Navigate to infrastructure/aws/cloud_formation folder that has the above script file and run the script
+- Following parameters are expected while running the script: [cicd_stack_name name]
+
+Example command: ./csye6225-aws-cf-terminate-application-stack.sh cicdStack
+
+## Instructions to Run Shell Script to Setup AWS Application with AWS CloudFormation:
+- The application script is provided in the file csye6225-aws-cf-create-application-stack.sh
+- Open Terminal and Navigate to infrastructure/aws/cloud_formation folder that has the above script file and run the script
+- Following parameters are expected while running the script: [web stack name] [stack_name] [cicd_stack_name]
+
+Example command: ./csye6225-aws-cf-create-application-stack.sh webStack myStack cicdStack
+
+## Instructions to Run Shell Script to Teardown AWS Application with AWS CloudFormation:
+- The teardown script is provided in the file csye6225-aws-cf-terminate-application-stack.sh
+- Open Terminal and Navigate to infrastructure/aws/cloud_formation folder that has the above script file and run the script
+- Following parameters are expected while running the script: [webstack name]
+
+Example command: ./csye6225-aws-cf-terminate-application-stack.sh webStack
