@@ -39,12 +39,13 @@ if [ $ami_id_status -eq 0 ]; then
 	codedeploy_bucketname="code-deploy.${DNS}"
 	ec2tagfilter="webappEC2"
 	echo $ec2tagfilter
+	account_number=$(aws sts get-caller-identity --output text --query 'Account')
 	#cdappname="csye6225-webapp"
 	#echo $cdappname
 	dns_id_status=$? 
 	if [ $dns_id_status -eq 0 ]; then
 	  
-	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stack_name ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack ParameterKey=domain,ParameterValue=$DNS ParameterKey=codedeploybucketname,ParameterValue=$codedeploy_bucketname)
+	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-application.json --parameters ParameterKey=stackname,ParameterValue=$stack_name ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack ParameterKey=domain,ParameterValue=$DNS ParameterKey=codedeploybucketname,ParameterValue=$codedeploy_bucketname ParameterKey=accountnumber,ParameterValue=$account_number)
 	  echo $createOutput
 
 	  if [ $? -eq 0 ]; then

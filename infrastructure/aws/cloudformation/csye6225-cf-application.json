@@ -48,6 +48,10 @@
     "codedeploybucketname": {
       "Description": "Lambda Bucket Name",
       "Type": "String"
+    },
+    "accountnumber": {
+      "Description": "Account Number",
+      "Type": "String"
     }
   },
   "Resources": {
@@ -430,8 +434,7 @@
         }
       }
     },
-
- "ourSNSTopic": {
+    "ourSNSTopic": {
       "Type": "AWS::SNS::Topic",
       "Properties": {
         "TopicName": {
@@ -496,7 +499,6 @@
         "Timeout": 300,
         "MemorySize": 256
       }
-
     },
     "ourLambdaResourcePolicy": {
       "Type": "AWS::Lambda::Permission",
@@ -575,7 +577,70 @@
           "CodeDeployEC2ServiceRole"
         ]
       }
-
+    },
+    "ourLambdaFunctionPolicy": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "DependsOn": [
+        "DynamoDBTable"
+      ],
+      "Properties": {
+        "ManagedPolicyName": "LambdaFunctionPolicy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": "dynamodb:ListTables",
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:Query"
+              ],
+              "Resource": {
+                "Fn::GetAtt": [
+                  "DynamoDBTable",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "ses:SendEmail",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:ses:us-east-1:",
+                    {
+                      "Ref": "accountnumber"
+                    },
+                    ":identity/",
+                    {
+                      "Ref": "domain"
+                    }
+                  ]
+                  
+                ]
+              }
+            }
+          ]
+        },
+        "Roles": [
+          "LambdaRole"
+        ]
+      }
     }
   }
 }
