@@ -1109,7 +1109,7 @@ Resources:
           Priority: 70
           RuleId: !Ref wafrPHPInsecureRule
         - Action:
-            Type: ALLOW
+            Type: COUNT
           Priority: 80
           RuleId: !Ref wafrCSRFRule
         - Action:
