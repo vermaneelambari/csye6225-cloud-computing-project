@@ -278,6 +278,31 @@
                 ]
             }
         },
+        "ourNoWAFELBListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "ourELBTargetGroup"
+                        }
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "ourNoWAFLoadBalancer"
+                },
+                "Port": "443",
+                "Protocol": "HTTPS",
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "CertificateArn"
+                        }
+                    }
+                ]
+            }
+        },
         "ourELBTargetGroup": {
             "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
             "Properties": {
@@ -364,6 +389,51 @@
                 ]
             }
         },
+        "ourNoWAFLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Name": "webappNoWAFLoadBalancer",
+                "Scheme": "internet-facing",
+                "IpAddressType": "ipv4",
+                "Subnets": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "netstack"
+                                    },
+                                    "subnet1"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "netstack"
+                                    },
+                                    "subnet2"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "Type": "application",
+                "SecurityGroups": [
+                    {
+                        "Fn::GetAtt": [
+                            "ourLoadBalancerSecurityGroup",
+                            "GroupId"
+                        ]
+                    }
+                ]
+            }
+        },
         "ourLoadBalancerSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -403,6 +473,50 @@
                         }
                     }
                 ]
+            }
+        },
+        "ourNoWAFRoute53RecordSetA": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::GetAtt": [
+                            "ourLoadBalancer",
+                            "DNSName"
+                        ]
+                    },
+                    "EvaluateTargetHealth": "true",
+                    "HostedZoneId": {
+                        "Fn::GetAtt": [
+                            "ourLoadBalancer",
+                            "CanonicalHostedZoneID"
+                        ]
+                    }
+                },
+                "HostedZoneName": {
+                    "Fn::Join": [
+                        "nowaf.",
+                        [
+                            {
+                                "Ref": "domain"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Comment": "DNS name of our instance.",
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "domain"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A"
             }
         },
         "ourRoute53RecordSetA": {
