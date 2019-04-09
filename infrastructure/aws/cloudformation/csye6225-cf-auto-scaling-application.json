@@ -242,6 +242,9 @@
                 "TargetGroupARNs": [
                     {
                         "Ref": "ourELBTargetGroup"
+                    },
+                    {
+                        "Ref":"ourNoWAFELBTargetGroup"
                     }
                 ],
                 "Tags": [
@@ -285,7 +288,7 @@
                     {
                         "Type": "forward",
                         "TargetGroupArn": {
-                            "Ref": "ourELBTargetGroup"
+                            "Ref": "ourNoWAFELBTargetGroup"
                         }
                     }
                 ],
@@ -304,6 +307,47 @@
             }
         },
         "ourELBTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 40,
+                "HealthCheckTimeoutSeconds": 30,
+                "HealthyThresholdCount": 3,
+                "UnhealthyThresholdCount": 5,
+                "Protocol": "HTTP",
+                "Matcher": {
+                    "HttpCode": "401"
+                },
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPort": "8080",
+                "TargetGroupAttributes": [
+                    {
+                        "Key": "deregistration_delay.timeout_seconds",
+                        "Value": "20"
+                    }
+                ],
+                "Port": 8080,
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                {
+                                    "Ref": "netstack"
+                                },
+                                "vpcId"
+                            ]
+                        ]
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "csye6225"
+                    }
+                ]
+            }
+        },
+        "ourNoWAFELBTargetGroup": {
             "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
             "Properties": {
                 "HealthCheckIntervalSeconds": 40,
@@ -495,8 +539,9 @@
                 },
                 "HostedZoneName": {
                     "Fn::Join": [
-                        "nowaf.",
+                        "",
                         [
+                            "nowaf.",
                             {
                                 "Ref": "domain"
                             },
@@ -509,6 +554,7 @@
                     "Fn::Join": [
                         "",
                         [
+                            "nowaf.",
                             {
                                 "Ref": "domain"
                             },
