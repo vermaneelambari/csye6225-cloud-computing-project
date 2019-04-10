@@ -68,6 +68,36 @@
         "publicipaddress": {
             "Description": "Public IP of the current machine",
             "Type": "String"
+        },
+        "RDSusername": {
+            "Description": "RDS username",
+            "Type": "String"
+        },
+        "RDSpassword": {
+            "Description": "RDS password",
+            "Type": "String"
+        },
+        "RDSTableName": {
+            "Description": "RDS Table Name",
+            "Type": "String",
+            "Default": "csye6225"
+        },
+        "DynamoDBTableName": {
+            "Description": "DynamoDB Table Name",
+            "Type": "String",
+            "Default": "csye6225"
+        },
+        "CircleCIUser": {
+            "Description": "Username of CircleCI",
+            "Type": "String"
+        },
+        "LambdaRole": {
+            "Description": "Lambda Role Name",
+            "Type": "String"
+        },
+        "CodeDeployEC2ServiceRole": {
+            "Description": "CodeDeploy EC2 Service Role Name",
+            "Type": "String"
         }
     },
     "Resources": {
@@ -687,7 +717,9 @@
             "Properties": {
                 "Path": "/",
                 "Roles": [
-                    "CodeDeployEC2ServiceRole"
+                    {
+                    "Ref":"CodeDeployEC2ServiceRole"
+                    }
                 ]
             }
         },
@@ -763,14 +795,20 @@
                 "MultiAZ": "false",
                 "DBInstanceIdentifier": "csye6225-spring2019",
                 "EngineVersion": "5.6.37",
-                "MasterUsername": "csye6225master",
-                "MasterUserPassword": "csye6225password",
+                "MasterUsername": {
+                    "Ref": "RDSusername"
+                },
+                "MasterUserPassword": {
+                    "Ref": "RDSpassword"
+                },
                 "DBSubnetGroupName": {
                     "Ref": "MyDBSubnetGroup"
                 },
                 "Engine": "mysql",
                 "PubliclyAccessible": true,
-                "DBName": "csye6225",
+                "DBName": {
+                    "Ref": "RDSTableName"
+                },
                 "VPCSecurityGroups": [
                     {
                         "Ref": "DBSecurityGroup"
@@ -801,7 +839,9 @@
                     "AttributeName": "timestamp_ttl",
                     "Enabled": "true"
                 },
-                "TableName": "csye6225"
+                "TableName": {
+                    "Ref": "DynamoDBTableName"
+                }
             }
         },
         "InstanceSecurityGroup": {
@@ -834,23 +874,11 @@
                     },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": 80,
-                        "ToPort": 80,
-                        "CidrIp": "0.0.0.0/0"
-                    },
-                    {
-                        "IpProtocol": "tcp",
                         "FromPort": 8080,
                         "ToPort": 8080,
                         "SourceSecurityGroupId": {
                             "Ref": "ourLoadBalancerSecurityGroup"
                         }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": 443,
-                        "ToPort": 443,
-                        "CidrIp": "0.0.0.0/0"
                     }
                 ]
             }
@@ -983,7 +1011,9 @@
                         "DOMAIN_NAME": {
                             "Ref": "domain"
                         },
-                        "DYNAMODB_TABLE_NAME": "csye6225",
+                        "DYNAMODB_TABLE_NAME": {
+                            "Ref":"DynamoDBTableName"
+                        },
                         "TTL": 20
                     }
                 },
@@ -1035,7 +1065,9 @@
                     ]
                 },
                 "Users": [
-                    "circleci"
+                    {
+                        "Ref": "CircleCIUser"
+                    }
                 ]
             }
         },
@@ -1066,7 +1098,9 @@
                     ]
                 },
                 "Roles": [
-                    "CodeDeployEC2ServiceRole"
+                    {
+                        "Ref": "CodeDeployEC2ServiceRole"
+                    }
                 ]
             }
         },
@@ -1129,7 +1163,9 @@
                     ]
                 },
                 "Roles": [
-                    "LambdaRole"
+                    {
+                        "Ref": "LambdaRole"
+                    }
                 ]
             }
         },

@@ -51,12 +51,17 @@ if [ $ami_id_status -eq 0 ]; then
 	echo $WAF_CERTIFICATE_ARN
 	NOWAF_CERTIFICATE_ARN=$(aws acm list-certificates --query "CertificateSummaryList[?DomainName=='nowaf.${DNS}'].CertificateArn" --output text)
 	echo $NOWAF_CERTIFICATE_ARN
+	RDSusername="csye6225master"
+	RDSpassword="csye6225password"
+	CircleCIUser="circleci"
+	LambdaRole="LambdaRole"
+	CodeDeployEC2ServiceRole="CodeDeployEC2ServiceRole"
 	#cdappname="csye6225-webapp"
 	#echo $cdappname
 	dns_id_status=$? 
 	if [ $dns_id_status -eq 0 ]; then
 	  
-	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-auto-scaling-application.json --parameters ParameterKey=publicipaddress,ParameterValue=$PUBLIC_IP ParameterKey=NOWAFCertificateArn,ParameterValue=$NOWAF_CERTIFICATE_ARN ParameterKey=WAFCertificateArn,ParameterValue=$WAF_CERTIFICATE_ARN ParameterKey=LaunchConfigurationName,ParameterValue=$LAUNCH_CONFIGURATION_NAME ParameterKey=stackname,ParameterValue=$stack_name ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack ParameterKey=domain,ParameterValue=$DNS ParameterKey=codedeploybucketname,ParameterValue=$codedeploy_bucketname ParameterKey=accountnumber,ParameterValue=$account_number)
+	  createOutput=$(aws cloudformation create-stack --stack-name $stack_name --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-auto-scaling-application.json --parameters ParameterKey=RDSusername,ParameterValue=$RDSusername ParameterKey=RDSpassword,ParameterValue=$RDSpassword ParameterKey=CircleCIUser,ParameterValue=$CircleCIUser ParameterKey=LambdaRole,ParameterValue=$LambdaRole ParameterKey=CodeDeployEC2ServiceRole,ParameterValue=$CodeDeployEC2ServiceRole ParameterKey=publicipaddress,ParameterValue=$PUBLIC_IP ParameterKey=NOWAFCertificateArn,ParameterValue=$NOWAF_CERTIFICATE_ARN ParameterKey=WAFCertificateArn,ParameterValue=$WAF_CERTIFICATE_ARN ParameterKey=LaunchConfigurationName,ParameterValue=$LAUNCH_CONFIGURATION_NAME ParameterKey=stackname,ParameterValue=$stack_name ParameterKey=amiid,ParameterValue=$ami_id ParameterKey=netstack,ParameterValue=$net_stack ParameterKey=bucketname,ParameterValue=$bucket_name ParameterKey=ec2tagfilter,ParameterValue=$ec2tagfilter ParameterKey=cicdstack,ParameterValue=$cicd_stack ParameterKey=domain,ParameterValue=$DNS ParameterKey=codedeploybucketname,ParameterValue=$codedeploy_bucketname ParameterKey=accountnumber,ParameterValue=$account_number)
 	  echo $createOutput
 
 	  if [ $? -eq 0 ]; then
