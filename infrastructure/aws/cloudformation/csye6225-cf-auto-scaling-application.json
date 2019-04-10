@@ -57,8 +57,12 @@
             "Description": "Launch Configuration Name",
             "Type": "String"
         },
-        "CertificateArn": {
+        "WAFCertificateArn": {
             "Description": "AWS Certificate Arn",
+            "Type": "String"
+        },
+        "NOWAFCertificateArn": {
+            "Description": "AWS Certificate Arn for NoWAF",
             "Type": "String"
         },
         "publicipaddress": {
@@ -275,7 +279,7 @@
                 "Certificates": [
                     {
                         "CertificateArn": {
-                            "Ref": "CertificateArn"
+                            "Ref": "WAFCertificateArn"
                         }
                     }
                 ]
@@ -300,7 +304,7 @@
                 "Certificates": [
                     {
                         "CertificateArn": {
-                            "Ref": "CertificateArn"
+                            "Ref": "NOWAFCertificateArn"
                         }
                     }
                 ]
@@ -503,19 +507,6 @@
                         "ToPort": "443",
                         "CidrIp": "0.0.0.0/0"
                     }
-                ],
-                "SecurityGroupEgress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "8080",
-                        "ToPort": "8080",
-                        "DestinationSecurityGroupId": {
-                            "Fn::GetAtt": [
-                                "InstanceSecurityGroup",
-                                "GroupId"
-                            ]
-                        }
-                    }
                 ]
             }
         },
@@ -525,14 +516,14 @@
                 "AliasTarget": {
                     "DNSName": {
                         "Fn::GetAtt": [
-                            "ourLoadBalancer",
+                            "ourNoWAFLoadBalancer",
                             "DNSName"
                         ]
                     },
                     "EvaluateTargetHealth": "true",
                     "HostedZoneId": {
                         "Fn::GetAtt": [
-                            "ourLoadBalancer",
+                            "ourNoWAFLoadBalancer",
                             "CanonicalHostedZoneID"
                         ]
                     }
@@ -541,7 +532,6 @@
                     "Fn::Join": [
                         "",
                         [
-                            "nowaf.",
                             {
                                 "Ref": "domain"
                             },
@@ -816,6 +806,9 @@
         },
         "InstanceSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
+            "DependsOn": [
+                "ourLoadBalancerSecurityGroup"
+            ],
             "Properties": {
                 "GroupName": "csye6225-webapp",
                 "GroupDescription": "csye6225 webapp security",
@@ -849,7 +842,9 @@
                         "IpProtocol": "tcp",
                         "FromPort": 8080,
                         "ToPort": 8080,
-                        "CidrIp": "0.0.0.0/0"
+                        "SourceSecurityGroupId": {
+                            "Ref": "ourLoadBalancerSecurityGroup"
+                        }
                     },
                     {
                         "IpProtocol": "tcp",
