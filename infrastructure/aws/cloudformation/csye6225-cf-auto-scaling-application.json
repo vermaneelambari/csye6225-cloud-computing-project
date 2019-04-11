@@ -57,12 +57,46 @@
             "Description": "Launch Configuration Name",
             "Type": "String"
         },
-        "CertificateArn": {
+        "WAFCertificateArn": {
             "Description": "AWS Certificate Arn",
+            "Type": "String"
+        },
+        "NOWAFCertificateArn": {
+            "Description": "AWS Certificate Arn for NoWAF",
             "Type": "String"
         },
         "publicipaddress": {
             "Description": "Public IP of the current machine",
+            "Type": "String"
+        },
+        "RDSusername": {
+            "Description": "RDS username",
+            "Type": "String"
+        },
+        "RDSpassword": {
+            "Description": "RDS password",
+            "Type": "String"
+        },
+        "RDSTableName": {
+            "Description": "RDS Table Name",
+            "Type": "String",
+            "Default": "csye6225"
+        },
+        "DynamoDBTableName": {
+            "Description": "DynamoDB Table Name",
+            "Type": "String",
+            "Default": "csye6225"
+        },
+        "CircleCIUser": {
+            "Description": "Username of CircleCI",
+            "Type": "String"
+        },
+        "LambdaRole": {
+            "Description": "Lambda Role Name",
+            "Type": "String"
+        },
+        "CodeDeployEC2ServiceRole": {
+            "Description": "CodeDeploy EC2 Service Role Name",
             "Type": "String"
         }
     },
@@ -242,6 +276,9 @@
                 "TargetGroupARNs": [
                     {
                         "Ref": "ourELBTargetGroup"
+                    },
+                    {
+                        "Ref":"ourNoWAFELBTargetGroup"
                     }
                 ],
                 "Tags": [
@@ -272,13 +309,79 @@
                 "Certificates": [
                     {
                         "CertificateArn": {
-                            "Ref": "CertificateArn"
+                            "Ref": "WAFCertificateArn"
+                        }
+                    }
+                ]
+            }
+        },
+        "ourNoWAFELBListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "ourNoWAFELBTargetGroup"
+                        }
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "ourNoWAFLoadBalancer"
+                },
+                "Port": "443",
+                "Protocol": "HTTPS",
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "NOWAFCertificateArn"
                         }
                     }
                 ]
             }
         },
         "ourELBTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 40,
+                "HealthCheckTimeoutSeconds": 30,
+                "HealthyThresholdCount": 3,
+                "UnhealthyThresholdCount": 5,
+                "Protocol": "HTTP",
+                "Matcher": {
+                    "HttpCode": "401"
+                },
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPort": "8080",
+                "TargetGroupAttributes": [
+                    {
+                        "Key": "deregistration_delay.timeout_seconds",
+                        "Value": "20"
+                    }
+                ],
+                "Port": 8080,
+                "VpcId": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                {
+                                    "Ref": "netstack"
+                                },
+                                "vpcId"
+                            ]
+                        ]
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "csye6225"
+                    }
+                ]
+            }
+        },
+        "ourNoWAFELBTargetGroup": {
             "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
             "Properties": {
                 "HealthCheckIntervalSeconds": 40,
@@ -364,6 +467,51 @@
                 ]
             }
         },
+        "ourNoWAFLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Name": "webappNoWAFLoadBalancer",
+                "Scheme": "internet-facing",
+                "IpAddressType": "ipv4",
+                "Subnets": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "netstack"
+                                    },
+                                    "subnet1"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "netstack"
+                                    },
+                                    "subnet2"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "Type": "application",
+                "SecurityGroups": [
+                    {
+                        "Fn::GetAtt": [
+                            "ourLoadBalancerSecurityGroup",
+                            "GroupId"
+                        ]
+                    }
+                ]
+            }
+        },
         "ourLoadBalancerSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -389,20 +537,52 @@
                         "ToPort": "443",
                         "CidrIp": "0.0.0.0/0"
                     }
-                ],
-                "SecurityGroupEgress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "8080",
-                        "ToPort": "8080",
-                        "DestinationSecurityGroupId": {
-                            "Fn::GetAtt": [
-                                "InstanceSecurityGroup",
-                                "GroupId"
-                            ]
-                        }
-                    }
                 ]
+            }
+        },
+        "ourNoWAFRoute53RecordSetA": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::GetAtt": [
+                            "ourNoWAFLoadBalancer",
+                            "DNSName"
+                        ]
+                    },
+                    "EvaluateTargetHealth": "true",
+                    "HostedZoneId": {
+                        "Fn::GetAtt": [
+                            "ourNoWAFLoadBalancer",
+                            "CanonicalHostedZoneID"
+                        ]
+                    }
+                },
+                "HostedZoneName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "domain"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Comment": "DNS name of our instance.",
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "nowaf.",
+                            {
+                                "Ref": "domain"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A"
             }
         },
         "ourRoute53RecordSetA": {
@@ -537,7 +717,9 @@
             "Properties": {
                 "Path": "/",
                 "Roles": [
-                    "CodeDeployEC2ServiceRole"
+                    {
+                    "Ref":"CodeDeployEC2ServiceRole"
+                    }
                 ]
             }
         },
@@ -613,14 +795,20 @@
                 "MultiAZ": "false",
                 "DBInstanceIdentifier": "csye6225-spring2019",
                 "EngineVersion": "5.6.37",
-                "MasterUsername": "csye6225master",
-                "MasterUserPassword": "csye6225password",
+                "MasterUsername": {
+                    "Ref": "RDSusername"
+                },
+                "MasterUserPassword": {
+                    "Ref": "RDSpassword"
+                },
                 "DBSubnetGroupName": {
                     "Ref": "MyDBSubnetGroup"
                 },
                 "Engine": "mysql",
                 "PubliclyAccessible": true,
-                "DBName": "csye6225",
+                "DBName": {
+                    "Ref": "RDSTableName"
+                },
                 "VPCSecurityGroups": [
                     {
                         "Ref": "DBSecurityGroup"
@@ -651,11 +839,16 @@
                     "AttributeName": "timestamp_ttl",
                     "Enabled": "true"
                 },
-                "TableName": "csye6225"
+                "TableName": {
+                    "Ref": "DynamoDBTableName"
+                }
             }
         },
         "InstanceSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
+            "DependsOn": [
+                "ourLoadBalancerSecurityGroup"
+            ],
             "Properties": {
                 "GroupName": "csye6225-webapp",
                 "GroupDescription": "csye6225 webapp security",
@@ -681,21 +874,11 @@
                     },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": 80,
-                        "ToPort": 80,
-                        "CidrIp": "0.0.0.0/0"
-                    },
-                    {
-                        "IpProtocol": "tcp",
                         "FromPort": 8080,
                         "ToPort": 8080,
-                        "CidrIp": "0.0.0.0/0"
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": 443,
-                        "ToPort": 443,
-                        "CidrIp": "0.0.0.0/0"
+                        "SourceSecurityGroupId": {
+                            "Ref": "ourLoadBalancerSecurityGroup"
+                        }
                     }
                 ]
             }
@@ -828,7 +1011,9 @@
                         "DOMAIN_NAME": {
                             "Ref": "domain"
                         },
-                        "DYNAMODB_TABLE_NAME": "csye6225",
+                        "DYNAMODB_TABLE_NAME": {
+                            "Ref":"DynamoDBTableName"
+                        },
                         "TTL": 20
                     }
                 },
@@ -880,7 +1065,9 @@
                     ]
                 },
                 "Users": [
-                    "circleci"
+                    {
+                        "Ref": "CircleCIUser"
+                    }
                 ]
             }
         },
@@ -911,7 +1098,9 @@
                     ]
                 },
                 "Roles": [
-                    "CodeDeployEC2ServiceRole"
+                    {
+                        "Ref": "CodeDeployEC2ServiceRole"
+                    }
                 ]
             }
         },
@@ -974,7 +1163,9 @@
                     ]
                 },
                 "Roles": [
-                    "LambdaRole"
+                    {
+                        "Ref": "LambdaRole"
+                    }
                 ]
             }
         },
